@@ -1,21 +1,38 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../routes/routes";
-import { CharacterIllustration, Sparkles } from "../components/illusttration";
+import { CharacterIllustration, Sparkles, Spinner } from "../components/illusttration";
 import { useAuth } from "../hooks";
 
 export default function Splash() {
   const navigate = useNavigate();
   const { user, initialized } = useAuth();
 
-  // If already logged in → skip to home (or aura selection)
+  // Auto-redirect to Home if already logged in, otherwise stay on Splash
   useEffect(() => {
     if (!initialized) return;
-    if (user) navigate(ROUTES.HOME, { replace: true });
+    if (user) {
+      navigate(ROUTES.HOME, { replace: true });
+    }
   }, [user, initialized, navigate]);
 
+  // While auth is initializing, show loading screen with cute message to keep user waiting
+  if (!initialized) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full w-full bg-linear-to-br from-pink-50 via-blue-50 to-purple-50">
+        <div className="w-8 h-8 text-aura-pink-dark mb-2">
+          <Spinner />
+        </div>
+        <p className="text-xs font-semibold text-aura-pink-dark animate-pulse">
+          Connecting with your AI Bestie... ✨
+        </p>
+      </div>
+    );
+  }
+
+  // If not logged in, show splash screen with cute intro and CTA to login/register
   return (
-    <div className="relative flex flex-col items-center justify-between h-full px-8 pt-16 pb-12 overflow-hidden">
+    <div className="relative flex flex-col items-center justify-between min-h-198 h-full w-full px-8 pt-16 pb-12 overflow-hidden">
       {/* Background blobs */}
       <div
         className="absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-40 animate-spin-slow"
@@ -79,10 +96,19 @@ export default function Splash() {
           style={{ animationDuration: "4s" }}
         >
           <span className="text-xs font-semibold text-aura-lav-dark">
-            💜 Luna is here
+            💭 Heavy heart...
+          </span>
+        </div>
+        <div
+          className="absolute -right-15 top-0 glass-card px-3 py-1.5 animate-float animation-delay-500"
+          style={{ animationDuration: "4s" }}
+        >
+          <span className="text-xs font-semibold text-aura-lav-dark">
+            🌱 Cozily quiet
           </span>
         </div>
       </div>
+      
 
       {/* CTA buttons */}
       <div className="relative z-10 w-full flex flex-col gap-3 animate-fade-up animation-fill-both animation-delay-400">
