@@ -124,12 +124,17 @@
     box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
   }
 
-  @media (max-width: 430px) {
+  @media (max-width: 480px) {
     .phone-shell {
-      width: 100vw;
-      height: 100dvh;
-      border-radius: 0;
-      box-shadow: none;
+      width: 100vw !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      border-radius: 0px !important;
+      box-shadow: none !important;
+    }
+    body {
+      display: block !important;
+      background: white !important; 
     }
   }
 
