@@ -1,14 +1,14 @@
 /// <reference types="vite/client" />
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl  = import.meta.env.VITE_SUPABASE_URL  as string
-const supabaseAnon = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseAnon = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 if (!supabaseUrl || !supabaseAnon) {
   throw new Error(
-    'Missing Supabase env vars.\n' +
-    'Create a .env file with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY'
-  )
+    "Missing Supabase env vars.\n" +
+      "Create a .env file with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY",
+  );
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnon, {
@@ -17,6 +17,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnon, {
     autoRefreshToken: true,
     detectSessionInUrl: true,
   },
-})
+});
 
-export type { User, Session } from '@supabase/supabase-js'
+export type { User, Session } from "@supabase/supabase-js";

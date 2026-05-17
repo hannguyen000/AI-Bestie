@@ -1,22 +1,27 @@
-/* donwload fonts from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Nunito:wght@400;600;700;800;900&display=swap');
+/* Download fonts from Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Nunito:wght@400;600;700;800;900&display=swap");
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind v4 structural import */
+@import "tailwindcss";
 
 /* ─── Base ─── */
 @layer base {
-  *, *::before, *::after { box-sizing: border-box; }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-  html, body, #root {
+  html,
+  body,
+  #root {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: 'DM Sans', sans-serif;
+    font-family: "DM Sans", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overscroll-behavior: none; /* prevent scroll chaining on mobile: white screen after pull to the end */
+    overscroll-behavior: none; /* prevent scroll chaining on mobile */
   }
 
   /* Mobile-first: center content in viewport */
@@ -29,7 +34,7 @@
   }
 }
 
-/* ─── Mobile shell ─── */
+/* ─── Mobile shell & Components ─── */
 @layer components {
   /* Simulates a phone screen on desktop */
   .phone-shell {
@@ -38,7 +43,9 @@
     height: 844px;
     max-height: 100dvh;
     border-radius: 2.5rem;
-    box-shadow: 0 25px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.15);
+    box-shadow:
+      0 25px 80px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(255, 255, 255, 0.15);
   }
 
   /* On small screens (real mobile devices), make it full viewport */
@@ -53,29 +60,31 @@
 
   /* ─── Pastel gradient background ─── */
   .bg-aura-gradient {
-    background: linear-gradient(160deg, #FDEAF4 0%, #EDE8FA 40%, #DAF0F7 100%);
+    background: linear-gradient(160deg, #fdeaf4 0%, #ede8fa 40%, #daf0f7 100%);
   }
 
   /* ─── Glass card ─── */
   .glass-card {
-    background: rgba(255,255,255,0.55);
+    background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.7);
-    box-shadow: 0 8px 32px rgba(180,100,140,0.12), inset 0 1px 0 rgba(255,255,255,0.8);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      0 8px 32px rgba(180, 100, 140, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
     border-radius: 1.5rem;
   }
 
   /* ─── Gradient text ─── */
   .text-gradient-pink {
-    background: linear-gradient(135deg, #C45C86, #7B6CC8);
+    background: linear-gradient(135deg, #c45c86, #7b6cc8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .text-gradient-peach {
-    background: linear-gradient(135deg, #D47A44, #C45C86);
+    background: linear-gradient(135deg, #d47a44, #c45c86);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -83,78 +92,85 @@
 
   /* ─── Primary button ─── */
   .btn-primary {
-    @apply relative overflow-hidden font-display font-bold text-white text-sm tracking-wide
+    @apply relative overflow-hidden text-white text-sm tracking-wide
            py-3.5 px-8 rounded-full transition-all duration-200
-           active:scale-95 focus:outline-none focus:ring-4 focus:ring-aura-pink/50;
-    background: linear-gradient(135deg, #C45C86, #7B6CC8);
-    box-shadow: 0 6px 24px rgba(196,92,134,0.35);
+           active:scale-95 focus:outline-none;
+    background: linear-gradient(135deg, #c45c86, #7b6cc8);
+    box-shadow: 0 6px 24px rgba(196, 92, 134, 0.35);
   }
 
   .btn-primary::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
     opacity: 0;
     transition: opacity 0.2s;
   }
 
-  .btn-primary:hover::before { opacity: 1; }
-  .btn-primary:hover { box-shadow: 0 8px 32px rgba(196,92,134,0.45); transform: translateY(-1px); }
+  .btn-primary:hover::before {
+    opacity: 1;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 32px rgba(196, 92, 134, 0.45);
+    transform: translateY(-1px);
+  }
 
   /* ─── Ghost / outline button ─── */
   .btn-ghost {
-    @apply font-display font-semibold text-sm py-3.5 px-8 rounded-full
+    @apply text-sm py-3.5 px-8 rounded-full
            border-2 transition-all duration-200 active:scale-95
-           focus:outline-none focus:ring-4 focus:ring-aura-pink/30;
-    border-color: rgba(196,92,134,0.4);
-    color: #C45C86;
-    background: rgba(255,255,255,0.4);
+           focus:outline-none;
+    border-color: rgba(196, 92, 134, 0.4);
+    color: #c45c86;
+    background: rgba(255, 255, 255, 0.4);
   }
 
   .btn-ghost:hover {
-    background: rgba(255,255,255,0.7);
-    border-color: #C45C86;
+    background: rgba(255, 255, 255, 0.7);
+    border-color: #c45c86;
   }
 
   /* ─── Input field ─── */
   .input-aura {
-    @apply w-full py-3.5 px-4 rounded-2xl text-sm font-body
+    @apply w-full py-3.5 px-4 rounded-2xl text-sm
            text-gray-700 placeholder-gray-400 outline-none
            transition-all duration-200;
-    background: rgba(255,255,255,0.7);
-    border: 1.5px solid rgba(180,140,160,0.25);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1.5px solid rgba(180, 140, 160, 0.25);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
   }
 
   .input-aura:focus {
-    border-color: #B8ABEC;
-    background: rgba(255,255,255,0.9);
-    box-shadow: 0 0 0 4px rgba(184,171,236,0.2), inset 0 1px 0 rgba(255,255,255,0.8);
+    border-color: #b8abec;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 0 0 4px rgba(184, 171, 236, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
   }
 
   /* ─── Floating sparkles (decorative) ─── */
   .sparkle {
-    @apply absolute pointer-events-none select-none text-aura-pink-mid animate-pulse-soft;
+    @apply absolute pointer-events-none select-none;
   }
 
   /* ─── Page transition wrappers ─── */
   .page-enter {
     @apply animate-fade-in;
   }
-
-  /* ─── Scrollbar ─── */
-  ::-webkit-scrollbar { width: 0; }
 }
 
-/* ─── Delay utilities ─── */
-@layer utilities {
-  .animation-delay-100 { animation-delay: 0.1s; }
-  .animation-delay-200 { animation-delay: 0.2s; }
-  .animation-delay-300 { animation-delay: 0.3s; }
-  .animation-delay-400 { animation-delay: 0.4s; }
-  .animation-delay-500 { animation-delay: 0.5s; }
-  .animation-delay-600 { animation-delay: 0.6s; }
-  .animation-delay-700 { animation-delay: 0.7s; }
-  .animation-fill-both { animation-fill-mode: both; }
+/* ─── Custom Utilities ─── */
+@utility animation-delay-100 { animation-delay: 0.1s; }
+@utility animation-delay-200 { animation-delay: 0.2s; }
+@utility animation-delay-300 { animation-delay: 0.3s; }
+@utility animation-delay-400 { animation-delay: 0.4s; }
+@utility animation-delay-500 { animation-delay: 0.5s; }
+@utility animation-delay-600 { animation-delay: 0.6s; }
+@utility animation-delay-700 { animation-delay: 0.7s; }
+@utility animation-fill-both { animation-fill-mode: both; }
+
+/* ─── Global Overrides ─── */
+::-webkit-scrollbar {
+  width: 0;
 }

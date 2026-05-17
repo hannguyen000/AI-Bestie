@@ -1,24 +1,24 @@
-import { Navigate, useLocation } from 'react-router-dom'
-import { type ReactNode } from 'react'
-import { useAuth } from '../hooks'
+import { Navigate, useLocation } from "react-router-dom";
+import { type ReactNode } from "react";
+import { useAuth } from "../hooks";
 
 // ─── Protected Route: requires auth ───────────────────────
 export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { user, initialized } = useAuth()
-  const location = useLocation()
+  const { user, initialized } = useAuth();
+  const location = useLocation();
 
-  if (!initialized) return <LoadingScreen />
-  if (!user) return <Navigate to="/" state={{ from: location }} replace />
-  return <>{children}</>
+  if (!initialized) return <LoadingScreen />;
+  if (!user) return <Navigate to="/" state={{ from: location }} replace />;
+  return <>{children}</>;
 }
 
 // ─── Public Route: redirect to home if already authed ─────
 export function PublicRoute({ children }: { children: ReactNode }) {
-  const { initialized } = useAuth()
+  const { initialized } = useAuth();
 
-  if (!initialized) return <LoadingScreen />
+  if (!initialized) return <LoadingScreen />;
   // Don't redirect splash; let other public pages redirect if authed
-  return <>{children}</>
+  return <>{children}</>;
 }
 
 // ─── Loading screen while auth initialize, keep user waiting ────────────────
@@ -32,5 +32,5 @@ function LoadingScreen() {
         </p>
       </div>
     </div>
-  )
+  );
 }
