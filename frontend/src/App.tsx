@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ROUTES } from "./routes/routes";
 
-import Splash from "./pages/Splash";
+import Splash from "./pages/splash";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import ChooseAura from "./pages/choose_aura";
