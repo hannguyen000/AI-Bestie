@@ -11,6 +11,9 @@ import { supabase } from "../config/supabase";
 import { logout as _logout } from "../services/authService";
 
 // ─── Types ─────────────────────────────────────────────────
+/**
+ * Represents the core authentication state stored in the React Context.
+ */
 interface AuthState {
   user: User | null;
   session: Session | null;
@@ -24,10 +27,18 @@ interface AuthContextValue extends AuthState {
 }
 
 // ─── Context ───────────────────────────────────────────────
+/**
+ * Create a data store which name AuthContext for saving authentication state, include parameters from AuthState anf logout, refreshSession
+ * Initialized with `null` as the default value before the Provider mounts.
+ */
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 // ─── Provider ──────────────────────────────────────────────
 export function AuthProvider({ children }: { children: ReactNode }) {
+  /**
+ * Initializes the unified authentication state with safe default values.
+ * `loading` starts as true because the app must immediately check for existing sessions.
+ */
   const [state, setState] = useState<AuthState>({
     user: null,
     session: null,
@@ -35,8 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initialized: false,
   });
 
-  // Initialize session on mount
+ /**
+   * Handles side effects on component mount.
+   * 1. Fetches any existing local session (e.g., from LocalStorage).
+   * 2. Establishes a persistent real-time listener for authentication state changes.
+   */
   useEffect(() => {
+    // 1. Fetch current active session asynchronously from storage on application startup (if it exist)
     supabase.auth.getSession().then(({ data: { session } }) => {
       setState({
         user: session?.user ?? null,
@@ -46,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     });
 
-    // Listen to auth state changes
+    // 2. Persistent real-time listener for authentication state changes. Wenn user login/register, the state would be changed
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -58,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }));
     });
 
-    return () => subscription.unsubscribe();
+    return () => subscription.unsubscribe(); // When AuthProvider not render anymore (when user close/stop/reload the app, redirect), the subscribtion real-time listener for authentication state changes will be stopped
   }, []);
 
   const logout = useCallback(async () => {
