@@ -58,8 +58,8 @@ export default function Splash() {
       <Sparkles />
 
       {/* Top: logo / tagline */}
-      <div className="relative z-10 text-center animate-fade-up animation-fill-both">
-        <div className="inline-flex items-center gap-2 bg-white/50 backdrop-blur-sm border border-white/60 rounded-full px-4 py-1.5 mb-5">
+      <div className="relative z-10 text-center animate-fade-up animation-fill-both -mt-6">
+        <div className="inline-flex items-center gap-2 backdrop-blur-sm border border-white/60 rounded-full px-4 py-1.5 mb-5 -mt-16">
           <span className="text-sm">✨</span>
           <span className="text-xs font-semibold text-aura-pink-dark tracking-wide">
             Your AI Bestie
@@ -79,7 +79,7 @@ export default function Splash() {
       </div>
 
       {/* Character illustration */}
-      <div className="relative z-10 w-52 h-64 animate-fade-in animation-fill-both animation-delay-200">
+      <div className="relative z-10 w-50 h-60 animate-fade-in animation-fill-both animation-delay-200 mt-8">
         <CharacterIllustration variant="default" animate />
 
         {/* Floating mood pills */}
@@ -114,20 +114,20 @@ export default function Splash() {
       <div className="relative z-10 w-full flex flex-col gap-3 animate-fade-up animation-fill-both animation-delay-400">
         <button
           onClick={() => navigate(ROUTES.REGISTER)}
-          className="btn-primary w-full text-base py-4"
+          className="btn-primary w-full text-base py-4 mb-10"
         >
           Start my journey ✨
         </button>
         <button
           onClick={() => navigate(ROUTES.LOGIN)}
-          className="btn-ghost w-full text-base py-4"
+          className="btn-ghost w-full text-base py-4 -mt-10 mb-30"
         >
           I already have an account
         </button>
       </div>
 
       {/* Bottom dots indicator */}
-      <div className="absolute bottom-5 flex gap-1.5">
+      <div className="absolute bottom-5 flex gap-1.5 ">
         <span className="w-5 h-1.5 rounded-full bg-aura-pink-dark" />
         <span className="w-1.5 h-1.5 rounded-full bg-aura-pink/50" />
         <span className="w-1.5 h-1.5 rounded-full bg-aura-pink/50" />

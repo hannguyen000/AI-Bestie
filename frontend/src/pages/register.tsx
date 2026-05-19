@@ -76,11 +76,11 @@ export default function SignUp() {
     e.preventDefault();
 
     if (!values.name || !values.email || !values.password) {
-      setError("Please fill in all fields 🌸");
+      setError("Please fill in all fields");
       return;
     }
     if (values.password.length < 8) {
-      setError("Password must be at least 8 characters 🔒");
+      setError("Password must be at least 8 characters");
       return;
     }
 
@@ -96,9 +96,9 @@ export default function SignUp() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
       if (msg.includes("already registered")) {
-        setError("This email is already registered 💌 Try logging in!");
+        setError("This email is already registered. Try logging in!");
       } else if (msg.includes("invalid email")) {
-        setError("That email doesn't look quite right 📧");
+        setError("That email doesn't look quite right");
       } else {
         setError(msg);
       }
@@ -136,9 +136,9 @@ export default function SignUp() {
       </button>
 
       {/* Character (smaller, top right) */}
-      <div className="relative z-10 flex justify-center pt-10 pb-1">
+      <div className="relative z-10 flex justify-center pt-15 pb-1">
         <div className="w-28 h-36 animate-fade-in animation-fill-both">
-          <CharacterIllustration variant="healer" animate />
+          <CharacterIllustration variant="default" animate />
         </div>
       </div>
 
@@ -174,7 +174,7 @@ export default function SignUp() {
               <InputField
                 icon={<MailIcon />}
                 name="email"
-                type="email"
+                type="email" required
                 placeholder="Email address"
                 autoComplete="email"
                 value={values.email}

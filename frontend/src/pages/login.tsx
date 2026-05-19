@@ -111,7 +111,7 @@ export default function Login() {
       {/* Character */}
       <div className="relative z-10 flex justify-center pt-12 pb-2">
         <div className="w-36 h-44 animate-fade-in animation-fill-both">
-          <CharacterIllustration variant="healer" animate />
+          <CharacterIllustration variant="default" animate />
         </div>
       </div>
 
