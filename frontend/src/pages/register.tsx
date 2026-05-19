@@ -255,7 +255,7 @@ export default function SignUp() {
 // ─── Password strength indicator ──────────────────────────
 function PasswordStrength({ password }: { password: string }) {
   const score = getPasswordScore(password);
-  const labels = ["Too weak", "Weak", "OK", "Good", "Strong 💪"];
+  const labels = ["Too weak", "Weak", "OK", "Good", "Strong"];
   const colors = [
     "bg-red-300",
     "bg-orange-300",
