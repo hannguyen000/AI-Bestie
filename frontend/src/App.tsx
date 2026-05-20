@@ -14,8 +14,8 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         
-        <div className="min-h-screen bg-gradient-to-br from-pink-100 via-blue-100 to-purple-100 p-4 md:p-8 flex items-center justify-center">
-          <div className="phone-shell relative w-full max-w-[402px] h-[812px] bg-white rounded-[48px] shadow-[0_24px_60px_rgba(0,0,0,0.15)] border-[10px] border-white overflow-hidden flex flex-col">
+        <div className="min-h-screen bg-linear-to-br from-pink-100 via-blue-100 to-purple-100 p-4 md:p-8 flex items-center justify-center">
+          <div className="phone-shell relative w-full max-w-100.5 h-203 bg-white rounded-[48px] shadow-[0_24px_60px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
             <Routes>
               <Route path={ROUTES.SPLASH} element={<Splash />} />
               <Route path={ROUTES.LOGIN} element={<Login />} />

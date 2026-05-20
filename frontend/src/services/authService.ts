@@ -17,7 +17,7 @@ export async function signUp({ name, email, password }: SignUpData) {
     email,
     password,
     options: {
-      data: { display_name: name },
+      data: { username: name },
     },
   });
   if (error) throw error;
@@ -58,11 +58,15 @@ export async function saveAuraSelection(auraId: string) {
     id: user.id,
     aura_id: auraId,
     updated_at: new Date().toISOString(),
+    }, {
+    onConflict: 'id' // update existing record if user already has a profile
   });
 
-  if (error) throw error;
-}
-
+  if (error) {
+    console.error("detail error from Supabase:", error);
+    throw error;
+  }
+  };
 // ─── Get user profile ──────────────────────────────────────
 export async function getProfile(userId: string) {
   const { data, error } = await supabase

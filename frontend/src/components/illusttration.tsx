@@ -40,7 +40,7 @@ export function CharacterIllustration({
 
   return (
     <div
-      className={`relative flex items-center justify-center ${animate ? "animate-float" : ""} ${className}`}
+      className={`relative flex items-center justify-center ${className}`}
     >
       {/* 1. Glow effect */}
       <div
@@ -54,7 +54,7 @@ export function CharacterIllustration({
       <img
         src={imageUrl}
         alt={`Aura character ${variant}`}
-        className="relative z-10 w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.12)] transition-all duration-300"
+        className="relative z-10 w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.12)] transition-all duration-300 rounded-2xl"
       />
     </div>
   );
