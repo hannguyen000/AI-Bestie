@@ -44,7 +44,7 @@ export function CharacterIllustration({
     >
       {/* 1. Glow effect */}
       <div
-        className="absolute inset-0 rounded-full opacity-40 animate-pulse-soft"
+        className={`absolute inset-0 rounded-full opacity-40 ${animate ? 'animate-pulse-soft' : ''}`}
         style={{
           background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
         }}
