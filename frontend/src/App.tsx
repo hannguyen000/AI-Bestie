@@ -1,13 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ROUTES } from "./routes/routes";
 
-// Import AuthProvider từ đúng thư mục context của bạn
 import { AuthProvider } from "./context/AuthContext"; 
 
 import Splash from "./pages/splash";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import ChooseAura from "./pages/choose_aura";
+import Home from "./pages/home";
+import ProfileSetup from "./pages/profile_setup";
 
 function App() {
   return (
@@ -21,10 +22,8 @@ function App() {
               <Route path={ROUTES.LOGIN} element={<Login />} />
               <Route path={ROUTES.REGISTER} element={<Register />} />
               <Route path={ROUTES.AURA_SELECTION} element={<ChooseAura />} />
-              <Route
-                path={ROUTES.HOME}
-                element={<div className="p-6"> AI Bestie 🌸</div>}
-              />
+              <Route path={ROUTES.HOME} element={<Home />} />
+              <Route path={ROUTES.PROFILE_SETUP} element={<ProfileSetup />} />
             </Routes>
           </div>
         </div>

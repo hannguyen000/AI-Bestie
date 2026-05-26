@@ -64,7 +64,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login({ email: values.email, password: values.password });
-      navigate(ROUTES.AURA_SELECTION, { replace: true });
+      navigate(ROUTES.HOME, { replace: true });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
       // Friendlier error messages
