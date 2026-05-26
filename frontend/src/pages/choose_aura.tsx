@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ROUTES } from "../routes/routes";
 import { saveAuraSelection } from "../services/authService";
 import {
@@ -69,6 +69,8 @@ const AURAS: Aura[] = [
 ];
 
 export default function AuraSelection() {
+  const [searchParams] = useSearchParams();
+  const isOnboarding = searchParams.get("onboarding") === "true";
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -98,9 +100,16 @@ export default function AuraSelection() {
     setLoading(true);
     try {
       await saveAuraSelection(aura.id);
-    } catch {
+
+      if (isOnboarding) {
+        navigate(ROUTES.PROFILE_SETUP, { replace: true });
+      } else {
+        navigate(ROUTES.HOME, { replace: true }); 
+      }
+    } catch (error) {
+      console.error("Error selecting aura:", error);
     } finally {
-      navigate(ROUTES.HOME, { replace: true });
+      setLoading(false);
     }
   }
 

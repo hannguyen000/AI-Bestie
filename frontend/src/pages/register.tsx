@@ -92,7 +92,7 @@ export default function SignUp() {
         password: values.password,
       });
       // After signup, go to Aura selection
-      navigate(ROUTES.AURA_SELECTION, { replace: true });
+      navigate(`${ROUTES.AURA_SELECTION}?onboarding=true`, { replace: true });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
       if (msg.includes("already registered")) {
