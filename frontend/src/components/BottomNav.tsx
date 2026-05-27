@@ -4,8 +4,8 @@ import { ROUTES } from "../routes/routes";
 
 export function BottomNav() {
   return (
-    <div className="h-18 bg-white/80 backdrop-blur-md border-t border-white/50 flex justify-around items-center px-4 shadow-[0_-4px_10px_-2px_rgba(34,197,94,0.5)] 
-                hover:shadow-[0_-6px_15px_-3px_rgba(168,85,247,0.5)] transition-shadow duration-300">
+    <div className="h-18 bg-white/80 backdrop-blur-md border-t border-white/50 flex justify-around items-center px-4 
+                shadow-[0_-4px_10px_-2px_rgba(156,163,175,0.5)]">
       <Link to={ROUTES.GLOW_UP}>
         <NavIcon icon={<Sparkles size={20} />} label="Glow up" />
       </Link>
