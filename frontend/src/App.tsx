@@ -9,6 +9,7 @@ import Register from "./pages/register";
 import ChooseAura from "./pages/choose_aura";
 import Home from "./pages/home";
 import ProfileSetup from "./pages/profile_setup";
+import Profile from "./pages/profile";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
               <Route path={ROUTES.AURA_SELECTION} element={<ChooseAura />} />
               <Route path={ROUTES.HOME} element={<Home />} />
               <Route path={ROUTES.PROFILE_SETUP} element={<ProfileSetup />} />
+              <Route path={ROUTES.PROFILE} element={<Profile />} />
             </Routes>
           </div>
         </div>
