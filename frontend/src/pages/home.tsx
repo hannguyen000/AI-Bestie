@@ -3,29 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Droplets, CalendarDays } from "lucide-react";
 import { supabase } from "../config/supabase";
 import AppLayout from "../layouts/appLayout"; 
-
-// Mock Data
-const CHARACTER_IMAGES: Record<string, string> = {
-  healer: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/healer_no_bg.png",
-  mentor: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/mentor_no_bg.png",
-  sunshine: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/sunshine_no_bg.png",
-};
-const CHARACTER_BACKGROUNDS: Record<string, string> = {
-  healer: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/healer_chat_background.jpg",
-  mentor: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/mentor_background.jpg",
-  sunshine: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/sunshine_background.jpg",
-};
-const TEXT_COLORS: Record<string, string> = {
-  healer: "#810E0E",
-  mentor: "#4A375F",
-  sunshine: "#A04D1B",
-};
-const PASTE_COLORS: Record<string, string> = {
-  healer: "#faeeee", // Hồng nhạt pastel
-  mentor: "#E8EAF6", // Tím nhạt pastel
-  sunshine: "#FFF3E0", // Cam nhạt pastel
-};
-
+import { 
+  CHARACTER_IMAGES, 
+  CHARACTER_BACKGROUNDS, 
+  TEXT_COLORS, 
+  PASTE_COLORS 
+} from "../config/auraConfig";
 
 export default function Home() {
   const [profile, setProfile] = useState<any>(null);
