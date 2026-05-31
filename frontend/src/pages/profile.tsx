@@ -5,7 +5,7 @@ import { supabase } from "../config/supabase";
 
 import { 
   CHARACTER_IMAGES, 
-  //CHARACTER_BACKGROUNDS,
+  CHARACTER_BACKGROUNDS,
 } from "../config/auraConfig";
 
 const BACKGROUND = {
@@ -44,26 +44,39 @@ export default function Profile() {
             opacity: 0.5 
           }}
     /> 
-    <div className="relative z-10 h-full w-full overflow-y-auto px-6 pb-20">
+    <div className="relative z-10 h-full w-full overflow-y-auto pb-20">
       {/* 1. Header Avatar & Info */}
       <div className="flex flex-col items-center mb-8">
-        <div className="relative">
-          <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl">
+        {/* Cover Photo */}
+        <div 
+          className="w-full h-40 bg-linear-to-r from-pink-300 to-purple-400"
+          style={{
+            backgroundImage: `url('${CHARACTER_BACKGROUNDS[profile?.aura_id] || CHARACTER_BACKGROUNDS.default}')`, // Thay bằng link ảnh của bạn
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        />
+
+        {/* Container Avatar above Cover Photo*/}
+        <div className="relative -mt-16">
+          <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl bg-white overflow-hidden">
             <img 
-                src={CHARACTER_IMAGES[profile?.avatar_url] || CHARACTER_IMAGES.default} 
-                className="w-32 h-40 object-contain drop-shadow-lg -mt-2 -mb-2" 
+              src={CHARACTER_IMAGES[profile?.avatar_url] || CHARACTER_IMAGES.default} 
+              className="w-full h-full object-cover" 
+              alt="Avatar"
             />
           </div>
-          <button className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg text-pink-500">
+          <button className="absolute bottom-1 right-1 p-2 bg-white rounded-full shadow-lg text-pink-500 border border-gray-100">
             <Pencil size={16} />
           </button>
         </div>
+
         <h2 className="mt-4 text-2xl font-black text-gray-800">{profile?.username || "Bestie"}</h2>
         <p className="text-sm text-gray-400 font-medium">Premium Member</p>
       </div>
     
         {/* 2. Info Card (BMI Scale) */}
-        <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 bg-white/60">
+        <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 bg-white/60 mr-5 ml-5">
             <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4">Info</h3>
                 <div className="grid grid-cols-3 gap-4 mb-8">
                     {[
@@ -96,7 +109,7 @@ export default function Profile() {
         </div>
 
       {/* 3. Badges & Achievements */}
-      <div className="glass-card p-6 rounded-3xl shadow-lg mb-6">
+      <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 mr-5 ml-5">
         <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
           <Trophy size={16} className="text-yellow-500" /> Achievements
         </h3>
@@ -112,7 +125,7 @@ export default function Profile() {
       </div>
 
       {/* 4. Aura Status */}
-      <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-pink-50/30">
+      <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/30 mr-5 ml-5 mb-10">
         <h3 className="text-sm font-bold text-gray-700 mb-4">Current Aura</h3>
         <div className="flex items-center gap-4">
           <div className="relative">

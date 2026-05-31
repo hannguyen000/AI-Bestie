@@ -2,6 +2,7 @@ export const CHARACTER_IMAGES: Record<string, string> = {
   healer: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/healer_no_bg.png",
   mentor: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/mentor_no_bg.png",
   sunshine: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/sunshine_no_bg.png",
+  default: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/user-avatars/default_avatar.png",
 };
 
 export const CHARACTER_BACKGROUNDS: Record<string, string> = {
