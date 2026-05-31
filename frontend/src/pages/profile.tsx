@@ -1,9 +1,10 @@
-import { Pencil, Droplets, Trophy } from "lucide-react";
+import { Pencil, Droplets } from "lucide-react";
 import AppLayout from "../layouts/appLayout";
 import { useState, useEffect } from "react";
 import { supabase } from "../config/supabase";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout } from "../services/authService";
 
 import { 
   CHARACTER_IMAGES, 
@@ -35,6 +36,15 @@ export default function Profile() {
     fetchData();
     }, []);
     if (loading) return <div className="flex h-full items-center justify-center">Loading...</div>;
+
+    const handleLogout = async () => {
+      try {
+        await logout();
+        navigate("/login"); 
+      } catch (error) {
+        alert("Error logging out!");
+      }
+    };
 
     // function to handle avatar upload
     const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,8 +133,7 @@ export default function Profile() {
           />
         </div>
 
-        <h2 className="mt-4 text-2xl font-black text-gray-800">{profile?.username || "Bestie"}</h2>
-        <p className="text-sm text-gray-400 font-medium">Premium Member</p>
+        <h2 className="mt-4 text-xl text-gradient-pink font-black text-gray-800">{profile?.username || "Bestie"}</h2>
       </div>
     
         {/* 2. Info Card (BMI Scale) */}
@@ -132,7 +141,7 @@ export default function Profile() {
         <button onClick={() => navigate('/profile-setup')} className="absolute top-2 right-4 p-2 bg-white rounded-full shadow-lg text-pink-500 border border-gray-100 hover:bg-pink-50 transition-colors">
             <Pencil size={16} />
         </button>
-            <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4">Info</h3>
+            <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4"> ℹ Info</h3>
                 <div className="grid grid-cols-3 gap-4 mb-8">
                     {[
                     { label: "Weight", value: `${profile?.weight || "--"}kg` },
@@ -165,8 +174,7 @@ export default function Profile() {
 
       {/* 3. Badges & Achievements */}
       <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 mr-5 ml-5">
-        <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
-          <Trophy size={16} className="text-yellow-500" /> Achievements
+        <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4"> 🏆 Achievements
         </h3>
         <div className="flex gap-4">
           <div className="flex flex-col items-center gap-2">
@@ -181,7 +189,7 @@ export default function Profile() {
 
       {/* 4. Aura Status */}
       <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/30 mr-5 ml-5 mb-10">
-        <h3 className="text-sm font-bold text-gray-700 mb-4">Current Aura</h3>
+        <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4">❤️ Current Aura</h3>
         <div className="flex items-center gap-4">
           <div className="relative">
             <img 
@@ -194,6 +202,23 @@ export default function Profile() {
             <button onClick={() => navigate('/choose-aura')} className="text-xs bg-white px-4 py-1 rounded-full shadow mt-2">Change Aura</button>
           </div>
         </div>
+      </div>
+
+      {/* 4. App Settings */}
+      <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/30 mr-5 ml-5 mb-10">
+        <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4">⚙️ App Settings</h3>
+        <div className="space-y-4">
+        <button className="flex items-center gap-3 text-sm text-gray-700"><span>🌐</span> Language</button>
+        <button className="flex items-center gap-3 text-sm text-gray-700"><span>❓</span> Support & FAQ</button>
+        <button className="flex items-center gap-3 text-sm text-gray-700"><span>🔑</span> Account & Security</button>
+        
+        <button 
+          onClick={handleLogout}
+          className="w-full mt-4 py-2 bg-white/50 hover:bg-white/80 rounded-full text-sm font-bold text-red-700 shadow transition-all"
+        >
+          Logout
+        </button>
+      </div>
       </div>
     </div>
     </div>
