@@ -39,7 +39,6 @@ export default function Home() {
           className="absolute inset-0 z-0 opacity-50"
           style={{
             backgroundColor: PASTE_COLORS[profile?.aura_id] || PASTE_COLORS.healer,
-            // Kết hợp với background image nếu bạn vẫn muốn giữ ảnh gradient
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             opacity: 1.0

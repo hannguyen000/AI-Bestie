@@ -2,6 +2,8 @@ import { Pencil, Droplets, Trophy } from "lucide-react";
 import AppLayout from "../layouts/appLayout";
 import { useState, useEffect } from "react";
 import { supabase } from "../config/supabase";
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { 
   CHARACTER_IMAGES, 
@@ -18,6 +20,8 @@ export default function Profile() {
     const bmi = profile?.weight && profile?.height 
     ? ((profile.weight / ((profile.height / 100) ** 2))).toFixed(1) 
     : "0.0";
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
     async function fetchData() {
@@ -31,6 +35,47 @@ export default function Profile() {
     fetchData();
     }, []);
     if (loading) return <div className="flex h-full items-center justify-center">Loading...</div>;
+
+    // function to handle avatar upload
+    const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${profile?.id}-${Math.random()}.${fileExt}`;
+      const filePath = `user-avatars/${fileName}`;
+    
+
+      try {
+        setLoading(true);
+        // 1. Upload file to Supabase Storage
+        const { error: uploadError } = await supabase.storage
+          .from('user-avatars')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // 2. Get public URL of the uploaded file
+        const { data: { publicUrl } } = supabase.storage
+          .from('user-avatars')
+          .getPublicUrl(filePath);
+
+        // 3. Update user's profile with new avatar URL
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', profile.id);
+
+        if (updateError) throw updateError;
+
+        // 4. Update local state to reflect new avatar immediately
+        setProfile({ ...profile, avatar_url: publicUrl });
+      } catch (error) {
+        alert("Error uploading avatar: " + error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   return (
     <AppLayout>
@@ -51,8 +96,7 @@ export default function Profile() {
         <div 
           className="w-full h-40 bg-linear-to-r from-pink-300 to-purple-400"
           style={{
-            backgroundImage: `url('${CHARACTER_BACKGROUNDS[profile?.aura_id] || CHARACTER_BACKGROUNDS.default}')`, // Thay bằng link ảnh của bạn
-            backgroundSize: 'cover',
+            backgroundImage: `url('${CHARACTER_BACKGROUNDS[profile?.aura_id] || CHARACTER_BACKGROUNDS.default}')`, 
             backgroundPosition: 'center'
           }}
         />
@@ -61,14 +105,22 @@ export default function Profile() {
         <div className="relative -mt-16">
           <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl bg-white overflow-hidden">
             <img 
-              src={CHARACTER_IMAGES[profile?.avatar_url] || CHARACTER_IMAGES.default} 
+              src={profile?.avatar_url || CHARACTER_IMAGES.default} 
               className="w-full h-full object-cover" 
               alt="Avatar"
             />
           </div>
-          <button className="absolute bottom-1 right-1 p-2 bg-white rounded-full shadow-lg text-pink-500 border border-gray-100">
+          <button onClick={() => fileInputRef.current?.click()} className="absolute bottom-1 right-1 p-2 bg-white rounded-full shadow-lg text-pink-500 border border-gray-100">
             <Pencil size={16} />
           </button>
+          {/* Input hidden file */}
+          <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleAvatarUpload} 
+              className="hidden" 
+              accept="image/*" 
+          />
         </div>
 
         <h2 className="mt-4 text-2xl font-black text-gray-800">{profile?.username || "Bestie"}</h2>
@@ -77,6 +129,9 @@ export default function Profile() {
     
         {/* 2. Info Card (BMI Scale) */}
         <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 bg-white/60 mr-5 ml-5">
+        <button onClick={() => navigate('/profile-setup')} className="absolute top-2 right-4 p-2 bg-white rounded-full shadow-lg text-pink-500 border border-gray-100 hover:bg-pink-50 transition-colors">
+            <Pencil size={16} />
+        </button>
             <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4">Info</h3>
                 <div className="grid grid-cols-3 gap-4 mb-8">
                     {[
@@ -136,7 +191,7 @@ export default function Profile() {
           </div>
           <div>
             <p className="font-bold text-lg capitalize">{profile?.aura_id}</p>
-            <button className="text-xs bg-white px-4 py-1 rounded-full shadow mt-2">Change Aura</button>
+            <button onClick={() => navigate('/choose-aura')} className="text-xs bg-white px-4 py-1 rounded-full shadow mt-2">Change Aura</button>
           </div>
         </div>
       </div>
