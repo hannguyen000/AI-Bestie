@@ -5,7 +5,7 @@ import { supabase } from "../config/supabase";
 
 import { 
   CHARACTER_IMAGES, 
-  CHARACTER_BACKGROUNDS,
+  //CHARACTER_BACKGROUNDS,
 } from "../config/auraConfig";
 
 const BACKGROUND = {
@@ -140,6 +140,7 @@ function BMIScale({ bmi }: { bmi: number }) {
         if (bmi < 30) return { label: "Overweight", color: "text-blue-600" };
         return { label: "Obese", color: "text-purple-700" };
     };
+    
     // Calculate the position of the indicator based on BMI (assuming BMI range 15-35 for scaling)
     const [currentPos, setCurrentPos] = useState(0);
     // Smoothly animate the indicator to the new position whenever BMI changes
@@ -152,6 +153,8 @@ function BMIScale({ bmi }: { bmi: number }) {
 
         return () => clearTimeout(timer);
     }, [bmi]); // Re-run animation whenever BMI changes
+
+    const status = getStatus(bmi);
 
   return (
     <div className="relative">
@@ -168,8 +171,7 @@ function BMIScale({ bmi }: { bmi: number }) {
         style={{ left: `${currentPos}%` }}
       >
         <div className="flex flex-col items-center -ml-3">
-          <span className="text-pink-600 text-[10px]">▲</span>
-        </div>
+          <span className={`${status.color} text-[10px]`}>▲</span>        </div>
       </div>
     </div>
   );
