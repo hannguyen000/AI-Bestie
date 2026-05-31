@@ -85,16 +85,16 @@ export default function Home() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="glass-card p-4 rounded-3xl text-center shadow-lg ml-2">
-              <h2 className="font-body font-black text-xs mb-1  text-gradient-pink mb-4">
+            <div className="glass-card p-4 rounded-3xl text-center shadow-lg ml-2 mr-1">
+              <h2 className="font-body font-black text-xs text-gradient-pink mb-4">
                 WATER TRACKER
               </h2>
               <Droplets className="mx-auto mb-2 text-blue-400" />
               <p className="text-xl font-bold">{waterGoal}L</p>
               <p className="text-[10px] text-gray-400">Water Goal</p>
             </div>
-            <div className="glass-card p-4 rounded-3xl text-center shadow-lg mr-2 ml-2">
-              <h2 className="font-body font-black text-xs mb-1  text-gradient-pink mb-4">
+            <div className="glass-card p-4 rounded-3xl text-center shadow-lg ml-1 mr-2">
+              <h2 className="font-body font-black text-xs text-gradient-pink mb-4">
                 CYCLE TRACKER
               </h2>
               <CalendarDays className="mx-auto mb-2 text-pink-400" />
