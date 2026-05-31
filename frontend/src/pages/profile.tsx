@@ -204,7 +204,7 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* 4. App Settings */}
+      {/* 5. App Settings */}
       <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/30 mr-5 ml-5 mb-10">
         <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4">⚙️ App Settings</h3>
         <div className="space-y-4">
@@ -264,7 +264,8 @@ function BMIScale({ bmi }: { bmi: number }) {
         style={{ left: `${currentPos}%` }}
       >
         <div className="flex flex-col items-center -ml-3">
-          <span className={`${status.color} text-[10px]`}>▲</span>        </div>
+          <span className={`${status.color} text-[10px]`}>▲</span>        
+        </div>
       </div>
     </div>
   );
