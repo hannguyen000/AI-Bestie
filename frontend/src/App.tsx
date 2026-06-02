@@ -10,6 +10,9 @@ import ChooseAura from "./pages/choose_aura";
 import Home from "./pages/home";
 import ProfileSetup from "./pages/profile_setup";
 import Profile from "./pages/profile";
+import GlowUp from "./pages/glow_up";
+import Health from "./pages/health";
+import Closet from "./pages/closet";
 
 function App() {
   return (
@@ -26,6 +29,10 @@ function App() {
               <Route path={ROUTES.HOME} element={<Home />} />
               <Route path={ROUTES.PROFILE_SETUP} element={<ProfileSetup />} />
               <Route path={ROUTES.PROFILE} element={<Profile />} />
+              <Route path="*" element={<Splash />} />
+              <Route path={ROUTES.GLOW_UP} element={<GlowUp />} />
+              <Route path={ROUTES.HEALTH} element={<Health />} />
+              <Route path={ROUTES.CLOSET} element={<Closet />} />
             </Routes>
           </div>
         </div>

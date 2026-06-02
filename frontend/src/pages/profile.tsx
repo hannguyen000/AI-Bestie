@@ -106,7 +106,7 @@ export default function Profile() {
         <div 
           className="w-full h-40 bg-linear-to-r from-pink-300 to-purple-400"
           style={{
-            backgroundImage: `url('${CHARACTER_BACKGROUNDS[profile?.aura_id] || CHARACTER_BACKGROUNDS.default}')`, 
+            backgroundImage: `url('${CHARACTER_BACKGROUNDS.healer || CHARACTER_BACKGROUNDS.default}')`, 
             backgroundPosition: 'center'
           }}
         />
