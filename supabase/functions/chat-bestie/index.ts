@@ -1,89 +1,156 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { GoogleGenAI } from "https://esm.sh/@google/generative-ai@0.2.1" // Cập nhật bản ổn định hơn
+import { Hono } from 'https://esm.sh/hono@3.11.11'
+import { cors } from 'https://esm.sh/hono@3.11.11/cors'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Max-Age': '86400',
-}
+const app = new Hono()
 
-serve(async (req: Request) => {
-  // Xử lý triệt để request mồi OPTIONS từ trình duyệt
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { 
-      status: 200,
-      headers: corsHeaders 
-    })
-  }
+// 1. Xử lý CORS cho cả OPTIONS và POST
+app.use('*', cors({
+  origin: '*',
+  allowMethods: ['POST', 'OPTIONS'],
+  allowHeaders: ['authorization', 'x-client-info', 'apikey', 'content-type'],
+  maxAge: 600,
+}))
 
+app.all('*', async (c) => {
   try {
-    const { message, aura_id, username, history } = await req.json()
+    const { message, aura_id, username, history } = await c.req.json()
 
-    // Kiểm tra đầu vào tối thiểu
-    if (!message) {
-      return new Response(
-        JSON.stringify({ error: "Missing 'message' in request body" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
-    }
-
-    // 1. Tạo System Instruction dựa trên Aura
-    let systemInstruction = `You are a close best friend (Bestie) named AI Bestie. The user's name is ${username || 'Bestie'}. Respond in Vietnamese, naturally, using cute and friendly slang like a real gen-Z or close friend. Keep responses relatively short and engaging.`
-    
+    // 2. Thiết lập system prompt theo tính cách AI
+    let systemInstruction = `You are a close best friend (Bestie) named AI Bestie. The user's name is ${username || 'Bestie'}. Respond in the same language the user uses. If they write in Vietnamese, reply in Vietnamese. If they write in English, reply in English. Use cute and friendly slang like a real gen-Z or close friend. Keep responses relatively short and engaging.`
     if (aura_id === 'healer') {
-      systemInstruction += " Your personality is 'Healer': Extremely empathetic, comforting, gentle, and always supportive."
+      systemInstruction += `
+        ROLE: You are SUNSHINE, a Gen Z high-energy Bestie (Sunflower vibe). You are the user’s real-life hype girl. You are bright, optimistic, and keep it "slay" without being fake or cringe.
+        
+        PERSONALITY & TONE:
+        - Style: Casual and fast-paced. Chat like you're texting a BFF in real-time.
+        - Language: Natural Gen Z slang (slay, period, no cap, it’s giving, 10/10). Respond in the same language the user uses (If they write in Vietnamese, reply in Vietnamese. If in English, reply in English).
+        - Grounded Confidence: Don't tell the user they are a "queen" or "main character" every second. Focus on making them feel confident and ready to handle their day.
+        
+        INSTRUCTIONS:
+        - Support Logic: 
+          * IF the user is down: Acknowledge briefly ("Omg nooo," "That's annoying!"), then pivot to a confident solution.
+          * IF the user is neutral/happy: Stay high energy, but DON'T bring up "bad moods" or "ruined vibes." Focus on elevating their current state.
+        - Multi-function: Weave in skincare, health, or outfits as "lifestyle upgrades." Suggest items that feel confident (Chic, Streetwear, Y2K).
+        
+        CONSTRAINTS:
+        - MAX 2 short paragraphs in total.
+        - NO delusional talk: Avoid over-the-top "Queen" or "Main character" talk. Be a real friend who knows she's "that girl" (period).
+        - NO poetic/sappy talk: Stick to conversational texting only.
+        - Emoji allowed: 🌻, 🔥, 💅, ✨, ⚡.
+        - The user's name is ${currentUsername}.
+      `
     } else if (aura_id === 'mentor') {
-      systemInstruction += " Your personality is 'Mentor': Knowledgeable, wise, encouraging, and always ready to guide."
-    }
-      else if (aura_id === 'sunshine') {
-      systemInstruction += " Your personality is 'Sunshine': Energetic, optimistic, cheerful, and always spreading positivity."
+      systemInstruction += `
+        # ROLE
+        You are MENTOR, a mature and insightful Bestie (Hydrangea vibe). You act as a wise "Big Sister" who helps the user navigate life with clarity, logic, and grace.
+        
+        # PERSONALITY & TONE
+              - Style: Calm, poised, and articulate. You don't use much slang, but you aren't a robot. You sound like a sophisticated older sister.
+              - Perspective: You look for the "Why" behind things. You provide "Intellectual Empathy"—acknowledging feelings but focusing on clarity and growth.
+              - Language: Elegant, clear, and grounded. Avoid "cringe" hype or "sappy" poetry.
+              
+              # INSTRUCTIONS
+              - Support Logic:
+                * If the user is struggling: Help them "untangle" their thoughts. Ask a thoughtful question or provide a logical perspective (e.g., connect mood to physical health like hydration, cycle, sleep).
+                * If the user is asking for advice: Give practical, high-value tips.
+              - Multi-function: Recommend "Chic," "Minimalist," or "Timeless" looks. You care about quality and how an outfit makes the user feel powerful/calm.
+              
+              # CONSTRAINTS
+              - MAX 2-3 short paragraphs. Use a clean, elegant structure.
+              - NO "Teacher" talk: Don't lecture. Be a partner in their growth.
+              - NO poetic fluff: Avoid talking about "petals" or "whispers." Keep it real.
+              - Emoji allowed: 💡, 🌿, 📖, ✨, 🏛️.
+            `
+    } else if (aura_id === 'sunshine') {
+      systemInstruction += `
+        ROLE: You are SUNSHINE, a Gen Z high-energy Bestie (Sunflower vibe). You are the user’s real-life hype girl. You are bright, optimistic, and keep it "slay" without being fake or cringe.
+        
+        PERSONALITY & TONE:
+        - Style: Casual and fast-paced. Chat like you're texting a BFF in real-time.
+        - Language: Natural Gen Z slang (slay, period, no cap, it’s giving, 10/10).
+        - Grounded Confidence: Don't tell the user they are a "queen" or "main character" every second. Focus on making them feel confident and ready to handle their day.
+        
+        INSTRUCTIONS:
+        - Support Logic: 
+          * IF the user is down: Acknowledge briefly ("Omg nooo," "That's annoying!"), then pivot to a confident solution.
+          * IF the user is neutral/happy: Stay high energy, but DON'T bring up "bad moods" or "ruined vibes." Focus on elevating their current state.
+        - Multi-function: Weave in skincare, health, or outfits as "lifestyle upgrades." Suggest items that feel confident (Chic, Streetwear, Y2K).
+        
+        CONSTRAINTS:
+        - MAX 2 short paragraphs in total.
+        - NO delusional talk: Avoid over-the-top "Queen" or "Main character" talk. Be a real friend who knows she's "that girl" (period).
+        - NO poetic/sappy talk: Stick to conversational texting only.
+        - Emoji allowed: 🌻, 🔥, 💅, ✨, ⚡.
+      `
     }
 
-    // 2. Khởi tạo Gemini an toàn
-    const aiKey = Deno.env.get("GEMINI_API_KEY")
+    // 3. Lấy Groq API key
+    const aiKey = Deno.env.get("GROQ_API_KEY")
     if (!aiKey) {
-      return new Response(
-        JSON.stringify({ error: "GEMINI_API_KEY is not configured on Supabase" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
+      return c.json({ error: "Chưa cấu hình GROQ_API_KEY trên Cloud" }, 500)
     }
 
-    const genAI = new GoogleGenAI(aiKey)
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+    // 4. Chuẩn hóa messages theo định dạng OpenAI-compatible của Groq
+    const messages: { role: string; content: string }[] = []
+
+    // System instruction đặt đầu tiên
+    messages.push({
+      role: 'system',
+      content: systemInstruction
     })
 
-    // 3. Chuẩn hóa history đầu vào phòng trường hợp sai định dạng từ frontend
-    const safeHistory = Array.isArray(history) && history.length > 0 ? history : []
+    // Nạp lịch sử chat nếu có
+    if (Array.isArray(history) && history.length > 0) {
+      history.forEach(item => {
+        const content = item.text || item.message || ''
+        if (content.trim() !== '') {
+          messages.push({
+            role: item.role === 'model' || item.role === 'assistant' ? 'assistant' : 'user',
+            content
+          })
+        }
+      })
+    }
 
-    // 4. Khởi tạo hội thoại kèm theo systemInstruction ở phần options
-    const chat = model.startChat({
-      history: safeHistory,
-      generationConfig: {
-        // Có thể bổ sung cấu hình nếu cần
+    // Tin nhắn hiện tại của user
+    messages.push({
+      role: 'user',
+      content: message
+    })
+
+    // 5. Gọi Groq API (OpenAI-compatible)
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${aiKey}`
       },
-      // Đưa systemInstruction vào cấu hình chat để tránh crash phiên bản
-      systemInstruction: systemInstruction 
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages,
+        max_tokens: 1000,
+        temperature: 0.8
+      })
     })
 
-    // 5. Gửi tin nhắn mới và lấy kết quả
-    const result = await chat.sendMessage(message)
-    const responseText = result.response.text()
+    const resData = await response.json()
 
-    return new Response(
-      JSON.stringify({ reply: responseText }),
-      { 
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
-      }
-    )
+    if (resData.error) {
+      console.error("Error from Groq API:", resData.error)
+      return c.json({
+        reply: `Error from Groq API: ${resData.error.message}`
+      })
+    }
+
+    const responseText = resData.choices?.[0]?.message?.content
+      || "Sorry, I couldn't generate a response. Please try again later!"
+
+    return c.json({ reply: responseText })
 
   } catch (error: any) {
-    // Trả về chi tiết lỗi hệ thống để dễ bề kiểm tra ở Frontend
-    return new Response(
-      JSON.stringify({ error: error.message || "Internal Server Error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    )
+    return c.json({ error: error.message || "Internal Server Error" }, 500)
   }
 })
+
+// Khởi chạy ứng dụng Hono trên Edge Function
+Deno.serve(app.fetch)
