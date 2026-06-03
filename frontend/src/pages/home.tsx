@@ -401,7 +401,7 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute inset-0 z-100 flex flex-col mt-10"
+              className="fixed inset-0 z-[9999] flex flex-col" 
               style={{
                 backgroundImage: `url(${CHARACTER_BACKGROUNDS[profile?.aura_id] || CHARACTER_BACKGROUNDS.healer})`,
                 backgroundSize: "cover",
@@ -466,7 +466,7 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
                 </div>
 
                 {/* Input */}
-                <div className="px-4 pb-8 pt-3 flex gap-2 items-center bg-white/30 backdrop-blur-sm" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
+                <div className="px-4 pb-8 pt-3 flex gap-2 items-center bg-white/30 backdrop-blur-sm" style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))' }}>
                   <input
                     type="text"
                     value={inputMessage}
