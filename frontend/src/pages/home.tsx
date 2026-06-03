@@ -466,7 +466,7 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
                 </div>
 
                 {/* Input */}
-                <div className="px-4 pb-8 pt-3 flex gap-2 items-center bg-white/30 backdrop-blur-sm">
+                <div className="px-4 pb-8 pt-3 flex gap-2 items-center bg-white/30 backdrop-blur-sm" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
                   <input
                     type="text"
                     value={inputMessage}
