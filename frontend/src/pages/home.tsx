@@ -9,107 +9,12 @@ import {
   TEXT_COLORS,
   PASTE_COLORS,
 } from "../config/auraConfig";
-
-// Helpers
-
-function getWeatherLabel(weather: any): string {
-  if (!weather) return "mild";
-  const temp = weather.main?.temp ?? 25;
-  const desc = (weather.weather?.[0]?.main ?? "").toLowerCase();
-  if (desc.includes("rain") || desc.includes("drizzle")) return "rainy";
-  if (desc.includes("snow")) return "snowy";
-  if (desc.includes("cloud")) return temp < 20 ? "cool and cloudy" : "warm and cloudy";
-  if (temp >= 32) return "hot";
-  if (temp >= 25) return "warm and sunny";
-  if (temp >= 18) return "pleasant";
-  return "cool";
-}
-
-async function fetchOutfitCaption(
-  weatherLabel: string,
-  styleTags: string[],
-  groqKey: string
-): Promise<string> {
-  const prompt = `The weather today is ${weatherLabel}. The user's fashion style is: ${styleTags.join(", ")}. 
-Write ONE short, fun, gen-Z bestie sentence (max 15 words) suggesting a cute outfit for today. 
-No hashtags. Just the sentence.`;
-
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${groqKey}`,
-    },
-    body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 60,
-      temperature: 0.9,
-    }),
-  });
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content?.trim() ?? "Style it your way today! ✨";
-}
-
-const STYLE_QUERY_MAP: Record<string, string> = {
-  Cute:        "korean cute girl outfit ootd",
-  Trendy:      "trendy street style outfit ootd",
-  Sporty:      "sporty chic outfit athleisure ootd",
-  Office:      "office fashion women outfit elegant",
-  Street:      "streetwear outfit urban style ootd",
-  Harmonious:  "soft aesthetic outfit pastel fashion",
-  Minimalist:  "minimalist outfit clean aesthetic fashion",
-  Y2K:         "y2k fashion outfit aesthetic",
-  Boho:        "boho chic outfit aesthetic fashion",
-  Vintage:     "vintage outfit retro fashion aesthetic",
-};
-
-function getAgeGroup(age: number): string {
-  if (age < 18) return "teen girl";
-  if (age < 25) return "young woman";
-  if (age < 35) return "woman";
-  if (age < 50) return "midlife woman";
-  return "mature woman";
-}
-
-async function fetchPexelsImages(
-  tags: string[],
-  pexelsKey: string,
-  age?: number          
-): Promise<string[]> {
-  if (!tags?.length) return [];
-
-  const ageGroup = age ? getAgeGroup(age) : "woman";
-  const selectedTags = tags.slice(0, 2);
-  const allImages: string[] = [];
-
-  for (const tag of selectedTags) {
-    const baseQuery = STYLE_QUERY_MAP[tag] ?? `${tag} fashion outfit aesthetic ootd`;
-    // Kết hợp age group vào query
-    const query = `${ageGroup} ${baseQuery}`;
-    const perPage = selectedTags.length === 1 ? 3 : 2;
-    const randomPage = Math.floor(Math.random() * 5) + 1;
-
-    const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${perPage}&page=${randomPage}&orientation=portrait&size=medium`,
-      { headers: { Authorization: pexelsKey } }
-    );
-    const data = await res.json();
-    if (data.photos?.length) {
-      const shuffled = data.photos.sort(() => Math.random() - 0.5);
-      allImages.push(...shuffled.map((p: any) => p.src.large2x));
-    }
-  }
-
-  const unique = [...new Map(allImages.map(url => [url, url])).values()];
-  return unique.slice(0, 3);
-}
-
-// Component
+import { useOutfitBoard } from "../hooks/outfitBoard";
 
 export default function Home() {
   const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+    const [profileLoading, setProfileLoading] = useState(true);
+
 
   // Chat
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -118,12 +23,13 @@ export default function Home() {
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Pinterest + weather
-  const [weather, setWeather] = useState<any>(null);
-  const [pinterestImages, setPinterestImages] = useState<string[]>([]);
-  const [outfitCaption, setOutfitCaption] = useState<string>("");
-  const [boardTitle, setBoardTitle] = useState<string>("");
-  const [boardLoading, setBoardLoading] = useState(true);
+ const {
+    weather,
+    images,
+    caption,
+    title,
+    loading: boardLoading
+  } = useOutfitBoard(profile);
 
   // Send message 
   const handleSendMessage = async () => {
@@ -178,86 +84,12 @@ export default function Home() {
           .single();
         setProfile(data);
       }
-      setLoading(false);
+      setProfileLoading(false);
     }
     fetchData();
   }, []);
 
-  // Fetch weather + Pinterest board
-  useEffect(() => {
-    if (!profile) return;
-
-    async function buildBoard() {
-      console.log("styles:", profile?.styles);
-      console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
-      setBoardLoading(true);
-      try {
-        const weatherKey = import.meta.env.VITE_OPENWEATHER_KEY;
-        const pexelsKey = import.meta.env.VITE_PEXELS_ACCESS_KEY;
-        const groqKey = import.meta.env.VITE_GROQ_API_KEY; 
-
-        const pos = await new Promise<GeolocationPosition>((res, rej) =>
-          navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 })
-        ).catch(() => null);
-
-        let weatherData = null;
-        let weatherLabel = "mild";
-
-        if (pos && weatherKey) {
-          const { latitude, longitude } = pos.coords;
-          const wRes = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${weatherKey}`
-          );
-          weatherData = await wRes.json();
-          setWeather(weatherData);
-          weatherLabel = getWeatherLabel(weatherData);
-        }
-
-        // 2. Board title from style tags + weather
-        const tags: string[] = (() => {
-          try {
-            return JSON.parse(profile?.styles ?? "[]");
-          } catch {
-            return [];
-          }
-        })();
-        const tagLabel = tags.length > 0 ? tags.join(" & ") : "Your Style";
-        setBoardTitle(`${tagLabel} · ${weatherLabel}`.toUpperCase());
-
-        // 3. Fetch Pinterest images from Pexels based on style tags + weather
-        if (pexelsKey && tags.length > 0) {
-          const imgs = await fetchPexelsImages(tags, pexelsKey);
-          setPinterestImages(imgs);
-        }
-        // 4. Fetch AI-generated outfit caption from Groq based on weather + style tags
-        if (groqKey && tags.length > 0) {
-          const caption = await fetchOutfitCaption(weatherLabel, tags, groqKey);
-          setOutfitCaption(caption);
-        } else {
-          // Fallback caption without AI if no Groq key or no tags
-          const fallbacks: Record<string, string> = {
-            rainy: "It's raining! Wear a raincoat! 🌧️",
-            hot: "It's hot today, mix a crop top with wide legs for a cool look! ☀️",
-            cool: "It's getting cool, layer up with a jacket for an aesthetic look! 🍂",
-            snowy: "It's snowing, wear an oversized coat with boots for the win! ❄️",
-          };
-          setOutfitCaption(
-            fallbacks[weatherLabel] ??
-              `Hey, with today ${weatherLabel} weather, this look is perfect to you ✨`
-          );
-        }
-      } catch (e) {
-        console.error("Board build error:", e);
-        setOutfitCaption("Style it your way today! ✨");
-      } finally {
-        setBoardLoading(false);
-      }
-    }
-
-    buildBoard();
-  }, [profile]);
-
-  if (loading)
+  if (profileLoading)
     return <div className="flex h-full items-center justify-center">Loading...</div>;
 
   const waterGoal = profile ? (profile.weight * 0.033).toFixed(1) : "2.0";
@@ -275,7 +107,7 @@ export default function Home() {
         />
 
       <main className="flex-1 h-full overflow-y-auto">
-        <div className="max-w-3xl mx-auto p-6 overflow-y-auto">
+        <div className="max-w-3xl mx-auto p-2 overflow-y-auto">
           {/* Chat Widget Card */}
           <div
             className="relative p-2 rounded-3xl flex gap-4 items-center mb-6 mt-7 mx-2 overflow-hidden"
@@ -341,7 +173,7 @@ export default function Home() {
                 YOUR PINTEREST PICK
               </h3>
               {temp !== null && (
-                <span className="text-[10px] text-gray-400 font-medium md:text-sm">
+                <span className="text-[10px] text-gray-400 font-medium">
                   {temp}°C · {weather?.weather?.[0]?.description}
                 </span>
               )}
@@ -352,13 +184,13 @@ export default function Home() {
               <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse mb-3" />
             ) : (
               <p className="text-[11px] text-gray-500 mb-3 italic leading-relaxed md:text-sm">
-                {outfitCaption}
+                {caption}
               </p>
             )}
 
             {/* Board title tag */}
-            {!boardLoading && boardTitle && (
-              <div className="mb-10">
+            {!boardLoading && title && (
+              <div className="mb-2 md:mb-10">
                 <span
                   className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white md:text-sm"
                   style={{
@@ -366,7 +198,7 @@ export default function Home() {
                     opacity: 0.85,
                   }}
                 >
-                  {boardTitle}
+                  {title}
                 </span>
               </div>
             )}
@@ -377,8 +209,8 @@ export default function Home() {
                 ? [1, 2, 3].map((i) => (
                     <div key={i} className="flex-1 h-36 bg-gray-200 rounded-2xl animate-pulse" />
                   ))
-                : pinterestImages.length > 0
-                ? pinterestImages.map((url, i) => (
+                : images.length > 0
+                ? images.map((url, i) => (
                     <div key={i} className="flex-1 h-36 rounded-2xl overflow-hidden md:h-90">
                       <img
                         src={url}
