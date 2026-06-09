@@ -12,10 +12,6 @@ import {
   PASTE_COLORS,
 } from "../config/auraConfig";
 
-const BACKGROUND = {
-  background: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/gradiant_background.jpg",
-};
-
 export default function Profile() {
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
