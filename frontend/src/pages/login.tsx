@@ -2,7 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { ROUTES } from "../routes/routes";
 import { login } from "../services/authService";
 import { useFormState } from "../hooks";
-import { FormEvent } from "react";
+import { type FormEvent } from "react";
 
 import {
   InputField,

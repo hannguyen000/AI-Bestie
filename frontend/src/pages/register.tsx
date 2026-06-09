@@ -4,7 +4,6 @@ import { ROUTES } from "../routes/routes";
 import { signUp } from "../services/authService";
 import { useFormState } from "../hooks";
 import {
-  CharacterIllustration,
   InputField,
   ErrorMessage,
   Spinner,
