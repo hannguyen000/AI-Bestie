@@ -9,6 +9,7 @@ import { logout } from "../services/authService";
 import { 
   CHARACTER_IMAGES_WITHOUT_BG, 
   CHARACTER_BACKGROUNDS,
+  PASTE_COLORS,
 } from "../config/auraConfig";
 
 const BACKGROUND = {
@@ -89,12 +90,18 @@ export default function Profile() {
 
   return (
     <AppLayout>
+    {/* Background */}
+    <div
+      className="absolute inset-0 z-0"
+      style={{
+        backgroundColor: PASTE_COLORS[profile?.aura_id] || PASTE_COLORS.healer,
+      }}
+    />
     <main className="flex-1 h-full overflow-y-auto">
     <div className="max-w-3xl overflow-y-auto md:mx-auto">
     <div 
           className="absolute inset-0 z-0" 
           style={{
-            backgroundImage: `url(${BACKGROUND.background})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             opacity: 0.5 
@@ -107,7 +114,7 @@ export default function Profile() {
         <div 
           className="w-full h-40 bg-linear-to-r from-pink-300 to-purple-400"
           style={{
-            backgroundImage: `url('${CHARACTER_BACKGROUNDS.healer || CHARACTER_BACKGROUNDS.default}')`, 
+            backgroundImage: `url('${CHARACTER_BACKGROUNDS[profile?.aura_id] || CHARACTER_BACKGROUNDS.default}')`, 
             backgroundPosition: 'center'
           }}
         />
@@ -138,7 +145,7 @@ export default function Profile() {
       </div>
     
         {/* 2. Info Card (BMI Scale) */}
-        <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 bg-white/60 mr-5 ml-5">
+        <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 bg-white/50 mr-5 ml-5">
         <button onClick={() => navigate('/profile-setup')} className="absolute top-2 right-4 p-2 bg-white rounded-full shadow-lg text-pink-500 border border-gray-100 hover:bg-pink-50 transition-colors">
             <Pencil size={16} />
         </button>
@@ -174,7 +181,7 @@ export default function Profile() {
         </div>
 
       {/* 3. Badges & Achievements */}
-      <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 mr-5 ml-5">
+      <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 mr-5 ml-5 bg-white/50">
         <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4"> 🏆 Achievements
         </h3>
         <div className="flex gap-4">
@@ -189,7 +196,7 @@ export default function Profile() {
       </div>
 
       {/* 4. Aura Status */}
-      <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/30 mr-5 ml-5 mb-10">
+      <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/50 mr-5 ml-5 mb-10">
         <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4">❤️ Current Aura</h3>
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -206,7 +213,7 @@ export default function Profile() {
       </div>
 
       {/* 5. App Settings */}
-      <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/30 mr-5 ml-5 mb-10">
+      <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/50 mr-5 ml-5 mb-10">
         <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4">⚙️ App Settings</h3>
         <div className="space-y-4">
         <button className="flex items-center gap-3 text-sm text-gray-700"><span>🌐</span> Language</button>

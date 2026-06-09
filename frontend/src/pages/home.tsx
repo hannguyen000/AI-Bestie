@@ -170,10 +170,11 @@ export default function Home() {
             {/* Header */}
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-xs font-bold uppercase tracking-wider text-gradient-pink md:text-lg">
-                YOUR PINTEREST PICK
+                YOUR PINTEREST PICK TODAY
               </h3>
+              <br />
               {temp !== null && (
-                <span className="text-[10px] text-gray-400 font-medium">
+                <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap">
                   {temp}°C · {weather?.weather?.[0]?.description}
                 </span>
               )}
