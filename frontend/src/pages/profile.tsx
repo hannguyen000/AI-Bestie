@@ -89,7 +89,8 @@ export default function Profile() {
 
   return (
     <AppLayout>
-    <div className="relative h-full w-full overflow-hidden">
+    <main className="flex-1 h-full overflow-y-auto">
+    <div className="max-w-3xl overflow-y-auto md:mx-auto">
     <div 
           className="absolute inset-0 z-0" 
           style={{
@@ -99,7 +100,7 @@ export default function Profile() {
             opacity: 0.5 
           }}
     /> 
-    <div className="relative z-10 h-full w-full overflow-y-auto pb-20">
+    <div className="relative z-10 h-full w-full overflow-y-auto">
       {/* 1. Header Avatar & Info */}
       <div className="flex flex-col items-center mb-8">
         {/* Cover Photo */}
@@ -222,6 +223,7 @@ export default function Profile() {
       </div>
     </div>
     </div>
+    </main>
     </AppLayout>
   );
 }

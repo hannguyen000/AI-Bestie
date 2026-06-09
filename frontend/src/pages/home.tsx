@@ -265,7 +265,7 @@ export default function Home() {
 
   return (
     <AppLayout hideNav={isChatOpen}>
-      <div className="relative h-full w-full overflow-y-auto pb-20 md:flex-col">
+      <div className="relative h-full w-full overflow-y-auto pb-20 md:pb-0 md:flex-col">
         {/* Background */}
         <div
           className="absolute inset-0 z-0"
@@ -275,7 +275,7 @@ export default function Home() {
         />
 
       <main className="flex-1 h-full overflow-y-auto">
-        <div className="max-w-4xl mx-auto p-6 overflow-y-auto">
+        <div className="max-w-3xl mx-auto p-6 overflow-y-auto">
           {/* Chat Widget Card */}
           <div
             className="relative p-2 rounded-3xl flex gap-4 items-center mb-6 mt-7 mx-2 overflow-hidden"
@@ -402,7 +402,7 @@ export default function Home() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute inset-0 z-100 flex flex-col mt-10 md:max-w-4xl md:justify-center md:flex-col md:mx-auto"
+              className="absolute inset-0 z-100 flex flex-col mt-10 md:max-w-3xl md:justify-center md:flex-col md:mx-auto"
               style={{
                 backgroundImage: `url(${CHARACTER_BACKGROUNDS[profile?.aura_id] || CHARACTER_BACKGROUNDS.healer})`,
                 backgroundSize: "cover",
