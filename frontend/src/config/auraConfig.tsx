@@ -1,4 +1,4 @@
-export const CHARACTER_IMAGES: Record<string, string> = {
+export const CHARACTER_IMAGES_WITHOUT_BG: Record<string, string> = {
   healer: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/healer_no_bg.png",
   mentor: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/mentor_no_bg.png",
   sunshine: "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/sunshine_no_bg.png",

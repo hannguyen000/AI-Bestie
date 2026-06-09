@@ -7,7 +7,7 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children, hideNav }: AppLayoutProps) {
   return (
-    <div className="phone-shell relative h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden">
       <div className="flex-1 h-full w-full overflow-hidden flex flex-col">
         {children}
       </div>

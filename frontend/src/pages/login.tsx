@@ -1,15 +1,16 @@
-import { type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ROUTES } from "../routes/routes";
 import { login } from "../services/authService";
 import { useFormState } from "../hooks";
+import { FormEvent } from "react";
+
 import {
-  CharacterIllustration,
   InputField,
   ErrorMessage,
   Spinner,
   Sparkles,
 } from "../components/illusttration";
+import RotatingAura from "../components/illusttration";
 
 // ─── Icons ─────────────────────────────────────────────────
 function MailIcon() {
@@ -81,7 +82,7 @@ export default function Login() {
   }
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden">
+    <div className="relative flex flex-col h-full overflow-hidden md:flex-row">
       {/* Background blobs */}
       <div
         className="absolute -top-10 -right-10 w-56 h-56 rounded-full opacity-50"
@@ -108,22 +109,22 @@ export default function Login() {
         ←
       </button>
 
-      {/* Character */}
-      <div className="relative z-10 flex justify-center pt-12 pb-2">
-        <div className="w-36 h-44 animate-fade-in animation-fill-both">
-          <CharacterIllustration variant="default" animate />
+      {/* Illustration */}
+      <div className="relative z-10 flex justify-center pt-12 pb-2 md:flex md:flex-1 md:p-12 md:mt-30">
+        <div className="w-40 h-60 md:w-100 md:h-150 transition-all duration-1000 ease-in-out animate-float">
+          <RotatingAura className="w-40 h-60 md:w-100 md:h-150" />
         </div>
       </div>
 
       {/* Card */}
-      <div className="relative z-10 flex-1 mx-4 animate-slide-in animation-fill-both animation-delay-100">
+      <div className="relative z-10 flex-1 mx-4 animate-slide-in animation-fill-both animation-delay-100 md:flex-1 md:items-center">
         <div className="glass-card p-6 h-full flex flex-col">
           {/* Header */}
           <div className="text-center mb-6">
-            <h2 className="font-display font-black text-2xl text-gradient-pink mb-1">
+            <h2 className="font-display font-black text-2xl text-gradient-pink mb-1 md:text-3xl md:mt-30">
               Welcome back 🌙
             </h2>
-            <p className="text-xs font-body text-gray-400">
+            <p className="text-xs font-body text-gray-400 md:text-sm">
               So glad you came back, bestie ✨
             </p>
           </div>
@@ -131,9 +132,10 @@ export default function Login() {
           {/* Form */}
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col gap-3.5 flex-1"
+            className="flex flex-col gap-3.5 flex-1 w-full max-w-sm md:max-w-sm mx-auto md:justify-center md:mt-10"
           >
-            <div className="animate-fade-up animation-fill-both animation-delay-200">
+            
+            <div className="animate-fade-up animation-fill-both animation-delay-200 ">
               <InputField
                 icon={<MailIcon />}
                 name="email"
@@ -176,7 +178,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full py-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="btn-primary w-full py-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed md:-mt-10"
               >
                 {loading ? (
                   <>
@@ -189,7 +191,7 @@ export default function Login() {
             </div>
 
             {/* Sign up link */}
-            <p className="text-center text-xs text-gray-400 animate-fade-up animation-fill-both animation-delay-500">
+            <p className="text-center text-xs text-gray-400 animate-fade-up animation-fill-both animation-delay-500 md:mb-90">
               New here?{" "}
               <Link
                 to={ROUTES.REGISTER}

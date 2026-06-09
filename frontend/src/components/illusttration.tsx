@@ -1,5 +1,8 @@
-import type { InputHTMLAttributes, ReactNode } from "react";
+import { useState, type InputHTMLAttributes, type ReactNode } from "react";
+import { useEffect } from "react";
+import { CHARACTER_IMAGES_WITHOUT_BG } from "../config/auraConfig";
 
+// ─── Character illustration with glow effect ───────────────────────────────────────────────
 interface CharacterProps {
   variant?: "default" | "healer" | "mystic" | "solar" | "mentor" | "sunshine";
   className?: string;
@@ -22,10 +25,6 @@ const CHARACTER_IMAGES: Record<string, string> = {
     "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/aura_healer.png",
   mentor:
     "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/aura_mentor.png",
-  mystic:
-    "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/aura_mentor.png", // Dùng tạm ảnh mentor hoặc linh vật riêng của bạn
-  solar:
-    "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/aura_sunshine.png",
   sunshine:
     "https://ymivxyrrshkpyyrkndgu.supabase.co/storage/v1/object/public/system-assets/aura_sunshine.png",
 };
@@ -160,5 +159,34 @@ export function Spinner({
       <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
       <path d="M12 2a10 10 0 0 1 10 10" />
     </svg>
+  );
+}
+
+// ─── Rotating Aura Character (used in Splash, Register and Login pages) ───────────────────────────────
+interface RotatingAuraProps {
+  className?: string; // Để tùy chỉnh kích thước từ bên ngoài
+  intervalTime?: number; // Cho phép chỉnh tốc độ nhanh chậm tùy nơi
+}
+
+export default function RotatingAura({ className = "", intervalTime = 2000 }: RotatingAuraProps) {
+  const variants = ["default", "healer", "mentor", "sunshine"];
+  const [currentVariant, setCurrentVariant] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentVariant((prev) => (prev + 1) % variants.length);
+    }, intervalTime);
+
+    return () => clearInterval(interval);
+  }, [intervalTime, variants.length]);
+
+  return (
+    <div className={`transition-all duration-1000 ease-in-out animate-float ${className}`}>
+      <img 
+        src={CHARACTER_IMAGES_WITHOUT_BG[variants[currentVariant]]} 
+        alt="Aura Character"
+        className="w-full h-full object-contain transition-opacity duration-1000"
+      />
+    </div>
   );
 }

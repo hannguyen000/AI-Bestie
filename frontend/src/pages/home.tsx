@@ -4,7 +4,7 @@ import { Droplets, CalendarDays } from "lucide-react";
 import { supabase } from "../config/supabase";
 import AppLayout from "../layouts/appLayout";
 import {
-  CHARACTER_IMAGES,
+  CHARACTER_IMAGES_WITHOUT_BG,
   CHARACTER_BACKGROUNDS,
   TEXT_COLORS,
   PASTE_COLORS,
@@ -189,7 +189,7 @@ export default function Home() {
 
     async function buildBoard() {
       console.log("styles:", profile?.styles);
-console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
+      console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
       setBoardLoading(true);
       try {
         const weatherKey = import.meta.env.VITE_OPENWEATHER_KEY;
@@ -265,7 +265,7 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
 
   return (
     <AppLayout hideNav={isChatOpen}>
-      <div className="relative h-full w-full overflow-y-auto pb-20">
+      <div className="relative h-full w-full overflow-y-auto pb-20 md:flex-col">
         {/* Background */}
         <div
           className="absolute inset-0 z-0"
@@ -274,7 +274,8 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
           }}
         />
 
-        <div className="relative z-10 p-6">
+      <main className="flex-1 h-full overflow-y-auto">
+        <div className="max-w-4xl mx-auto p-6 overflow-y-auto">
           {/* Chat Widget Card */}
           <div
             className="relative p-2 rounded-3xl flex gap-4 items-center mb-6 mt-7 mx-2 overflow-hidden"
@@ -289,21 +290,21 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
                 opacity: 0.9,
               }}
             />
-            <div className="relative z-10 flex gap-4 items-center w-full">
+            <div className="relative z-10 flex gap-4 items-center w-full md:h-50">
               <img
-                src={CHARACTER_IMAGES[profile?.aura_id] || CHARACTER_IMAGES.healer}
-                className="w-32 h-40 object-contain drop-shadow-lg -mt-2 -mb-2"
+                src={CHARACTER_IMAGES_WITHOUT_BG[profile?.aura_id] || CHARACTER_IMAGES_WITHOUT_BG .healer}
+                className="w-32 h-40 object-contain drop-shadow-lg -mt-2 -mb-2 md:w-40 md:h-55"
               />
               <div className="flex-1 pr-3">
                 <p
-                  className="text-xs font-medium mb-5"
+                  className="text-xs font-medium mb-5 md:text-lg"
                   style={{ color: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer }}
                 >
                   Hey {profile?.username || "Bestie"}. How are you today?
                 </p>
                 <button
                   onClick={() => setIsChatOpen(true)}
-                  className="bg-white px-8 py-1 rounded-full text-xs font-bold shadow-md hover:scale-105 transition-transform"
+                  className="bg-white px-8 py-1 rounded-full text-xs font-bold shadow-md hover:scale-105 transition-transform md:text-lg"
                   style={{ color: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer }}
                 >
                   Start to chat
@@ -315,20 +316,20 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="glass-card p-4 rounded-3xl text-center shadow-lg ml-2 mr-1">
-              <h2 className="font-body font-black text-xs text-gradient-pink mb-4">
+              <h2 className="font-body font-black text-xs text-gradient-pink mb-4 md:text-lg">
                 WATER TRACKER
               </h2>
               <Droplets className="mx-auto mb-2 text-blue-400" />
               <p className="text-xl font-bold">{waterGoal}L</p>
-              <p className="text-[10px] text-gray-400">Water Goal</p>
+              <p className="text-[10px] text-gray-400 md:text-sm">Water Goal</p>
             </div>
-            <div className="glass-card p-4 rounded-3xl text-center shadow-lg ml-1 mr-2">
-              <h2 className="font-body font-black text-xs text-gradient-pink mb-4">
+            <div className="glass-card p-4 rounded-3xl text-center shadow-lg ml-1 mr-2 md:text-lg">
+              <h2 className="font-body font-black text-xs text-gradient-pink mb-4 md:text-lg">
                 CYCLE TRACKER
               </h2>
               <CalendarDays className="mx-auto mb-2 text-pink-400" />
               <p className="text-sm font-bold">Day 5</p>
-              <p className="text-[10px] text-gray-400">Cycle Tracker</p>
+              <p className="text-[10px] text-gray-400 md:text-sm">Cycle Tracker</p>
             </div>
           </div>
 
@@ -336,11 +337,11 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
           <div className="glass-card p-5 rounded-3xl mt-4 shadow-lg mx-2">
             {/* Header */}
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gradient-pink">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gradient-pink md:text-lg">
                 YOUR PINTEREST PICK
               </h3>
               {temp !== null && (
-                <span className="text-[10px] text-gray-400 font-medium">
+                <span className="text-[10px] text-gray-400 font-medium md:text-sm">
                   {temp}°C · {weather?.weather?.[0]?.description}
                 </span>
               )}
@@ -350,16 +351,16 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
             {boardLoading ? (
               <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse mb-3" />
             ) : (
-              <p className="text-[11px] text-gray-500 mb-3 italic leading-relaxed">
+              <p className="text-[11px] text-gray-500 mb-3 italic leading-relaxed md:text-sm">
                 {outfitCaption}
               </p>
             )}
 
             {/* Board title tag */}
             {!boardLoading && boardTitle && (
-              <div className="mb-2">
+              <div className="mb-10">
                 <span
-                  className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white"
+                  className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white md:text-sm"
                   style={{
                     backgroundColor: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer,
                     opacity: 0.85,
@@ -378,7 +379,7 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
                   ))
                 : pinterestImages.length > 0
                 ? pinterestImages.map((url, i) => (
-                    <div key={i} className="flex-1 h-36 rounded-2xl overflow-hidden">
+                    <div key={i} className="flex-1 h-36 rounded-2xl overflow-hidden md:h-90">
                       <img
                         src={url}
                         alt="style inspo"
@@ -401,7 +402,7 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute inset-0 z-100 flex flex-col mt-10"
+              className="absolute inset-0 z-100 flex flex-col mt-10 md:max-w-4xl md:justify-center md:flex-col md:mx-auto"
               style={{
                 backgroundImage: `url(${CHARACTER_BACKGROUNDS[profile?.aura_id] || CHARACTER_BACKGROUNDS.healer})`,
                 backgroundSize: "cover",
@@ -488,6 +489,7 @@ console.log("pexels key:", import.meta.env.VITE_PEXELS_ACCESS_KEY);
             </motion.div>
           )}
         </AnimatePresence>
+        </main>
       </div>
     </AppLayout>
   );

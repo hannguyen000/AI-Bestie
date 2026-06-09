@@ -111,7 +111,7 @@ export default function Splash() {
       
 
       {/* CTA buttons */}
-      <div className="relative z-10 w-full flex flex-col gap-3 animate-fade-up animation-fill-both animation-delay-400">
+      <div className="relative z-10 w-full flex flex-col gap-3 animate-fade-up animation-fill-both animation-delay-400 md:max-w-sm">
         <button
           onClick={() => navigate(ROUTES.REGISTER)}
           className="btn-primary w-full text-base py-4 mb-10"

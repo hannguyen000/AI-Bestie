@@ -10,6 +10,7 @@ import {
   Spinner,
   Sparkles,
 } from "../components/illusttration";
+import RotatingAura from "../components/illusttration";
 
 // ─── Icons ─────────────────────────────────────────────────
 function UserIcon() {
@@ -108,7 +109,7 @@ export default function SignUp() {
   }
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden">
+    <div className="relative flex flex-col h-full overflow-hidden overflow-y-auto md:flex-row">
       {/* Background blobs */}
       <div
         className="absolute top-0 left-0 w-52 h-52 rounded-full opacity-40"
@@ -135,10 +136,10 @@ export default function SignUp() {
         ←
       </button>
 
-      {/* Character (smaller, top right) */}
-      <div className="relative z-10 flex justify-center pt-15 pb-1">
-        <div className="w-28 h-36 animate-fade-in animation-fill-both">
-          <CharacterIllustration variant="default" animate />
+      {/* Illustration */}
+      <div className="relative z-10 flex justify-center pt-12 pb-2 md:flex md:flex-1 md:p-12 md:mt-30">
+        <div className="w-40 h-60 md:w-100 md:h-150 transition-all duration-1000 ease-in-out animate-float">
+          <RotatingAura className="w-40 h-60 md:w-100 md:h-150" />
         </div>
       </div>
 
@@ -147,7 +148,7 @@ export default function SignUp() {
         <div className="glass-card p-6 h-full flex flex-col">
           {/* Header */}
           <div className="text-center mb-5">
-            <h2 className="font-display font-black text-2xl text-gradient-peach mb-1">
+            <h2 className="font-display font-black text-2xl text-gradient-peach mb-1 md:mt-40 md:text-3xl">
               Create account 🌸
             </h2>
             <p className="text-xs font-body text-gray-400">
@@ -156,7 +157,7 @@ export default function SignUp() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3 flex-1">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3 flex-1 md:max-w-lg mx-auto md:justify-center">
             <div className="animate-fade-up animation-fill-both animation-delay-200">
               <InputField
                 icon={<UserIcon />}
@@ -217,7 +218,7 @@ export default function SignUp() {
             </p>
 
             {/* Submit */}
-            <div className="animate-fade-up animation-fill-both animation-delay-600 mt-auto">
+            <div className="animate-fade-up animation-fill-both animation-delay-600 mt-auto md:mt-10">
               <button
                 type="submit"
                 disabled={loading}
@@ -234,7 +235,7 @@ export default function SignUp() {
             </div>
 
             {/* Login link */}
-            <p className="text-center text-xs text-gray-400 animate-fade-up animation-fill-both animation-delay-700">
+            <p className="text-center text-xs text-gray-400 animate-fade-up animation-fill-both animation-delay-700 md:mb-60">
               Already have an account?{" "}
               <Link
                 to={ROUTES.LOGIN}

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { logout } from "../services/authService";
 
 import { 
-  CHARACTER_IMAGES, 
+  CHARACTER_IMAGES_WITHOUT_BG, 
   CHARACTER_BACKGROUNDS,
 } from "../config/auraConfig";
 
@@ -115,7 +115,7 @@ export default function Profile() {
         <div className="relative -mt-16">
           <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl bg-white overflow-hidden">
             <img 
-              src={profile?.avatar_url || CHARACTER_IMAGES.default} 
+              src={profile?.avatar_url || CHARACTER_IMAGES_WITHOUT_BG.default} 
               className="w-full h-full object-cover" 
               alt="Avatar"
             />
@@ -193,7 +193,7 @@ export default function Profile() {
         <div className="flex items-center gap-4">
           <div className="relative">
             <img 
-                src={CHARACTER_IMAGES[profile?.aura_id] || CHARACTER_IMAGES.default} 
+                src={CHARACTER_IMAGES_WITHOUT_BG[profile?.aura_id] || CHARACTER_IMAGES_WITHOUT_BG.default} 
                 className="w-32 h-40 object-contain drop-shadow-lg -mt-2 -mb-2" 
             />
           </div>
