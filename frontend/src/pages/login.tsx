@@ -110,7 +110,7 @@ export default function Login() {
       </button>
 
       {/* Illustration */}
-      <div className="relative z-10 flex justify-center pt-12 pb-2 md:flex md:flex-1 md:p-12 md:mt-30">
+      <div className="relative z-10 flex justify-center pt-12 pb-2 md:flex md:flex-1 md:p-12 md:mt-10">
         <div className="w-40 h-60 md:w-100 md:h-150 transition-all duration-1000 ease-in-out animate-float">
           <RotatingAura className="w-40 h-60 md:w-100 md:h-150" />
         </div>
