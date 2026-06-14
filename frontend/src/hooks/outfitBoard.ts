@@ -28,7 +28,7 @@ export function useOutfitBoard(profile: any) {
       setBoardData(prev => ({ ...prev, loading: true }));
       try {
         const pexelsKey = import.meta.env.VITE_PEXELS_ACCESS_KEY;
-        const groqKey = import.meta.env.VITE_GROQ_API_KEY;
+        const groqKey = import.meta.env.VITE_GROQ_STYLE_HELPER_API_KEY;
         const weatherKey = import.meta.env.VITE_OPENWEATHER_KEY;
 
         let weatherData = null;
