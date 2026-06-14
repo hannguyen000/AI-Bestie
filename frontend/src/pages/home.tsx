@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Droplets, CalendarDays } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { supabase } from "../config/supabase";
 import AppLayout from "../layouts/appLayout";
 import {
@@ -115,7 +115,6 @@ const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
   if (profileLoading)
     return <div className="flex h-full items-center justify-center">Loading...</div>;
 
-  const waterGoal = profile ? (profile.weight * 0.033).toFixed(1) : "2.0";
   const temp = weather ? Math.round(weather.main?.temp) : null;
 
   return (

@@ -19,7 +19,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="h-[100dvh] w-full bg-linear-to-br from-pink-100 via-blue-100 to-purple-100 overflow-hidden flex flex-col">
+        <div className="h-dvh w-full bg-linear-to-br from-pink-100 via-blue-100 to-purple-100 overflow-hidden flex flex-col">
           <Routes>
             <Route path={ROUTES.SPLASH} element={<Splash />} />
             <Route path={ROUTES.LOGIN} element={<Login />} />

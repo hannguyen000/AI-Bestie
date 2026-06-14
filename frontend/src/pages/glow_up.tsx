@@ -86,7 +86,7 @@ export default function GlowUp() {
         {/* 1. Monthly Glow Map */}
         <div className="glass-card p-5 rounded-3xl">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="font-black text-gray-800 text-sm uppercase tracking-wide">Monthly Glow Map</h2>
+          <h3 className="text-md text-gradient-pink font-bold text-gray-400 uppercase mb-4">Monthly Glow Map</h3>
             <span className="text-xs text-gray-400">{monthLabel}</span>
           </div>
           <div className="grid grid-cols-7 gap-1.5">
@@ -108,7 +108,7 @@ export default function GlowUp() {
 
         {/* 2. Daily Progress Overview */}
         <div className="glass-card p-5 rounded-3xl space-y-4">
-          <h2 className="font-black text-gray-800 text-sm uppercase tracking-wide">Daily Progress Overview</h2>
+          <h3 className="text-md text-gradient-pink font-bold text-gray-400 uppercase mb-4">Daily Progress Overview</h3>
           <Progress label="Skincare Ritual Progress" pct={skincarePct} color="bg-purple-400" />
           <div className="text-center py-1">
             <p className="text-[10px] text-gray-400 uppercase font-bold">Today's Total Glow</p>
@@ -120,7 +120,19 @@ export default function GlowUp() {
 
         {/* 3. Daily Habits Checklist */}
         <div className="glass-card p-5 rounded-3xl">
-          <h2 className="font-black text-gray-800 text-sm uppercase tracking-wide mb-1">Daily Habits Checklist</h2>
+          <h3 className="text-md text-gradient-pink font-bold text-gray-400 uppercase mb-4">Daily Habits Checklist</h3>
+          <div className="flex flex-col items-center mb-5">
+            <WaterBottle pct={waterPct} className="w-24 h-40" />
+            <p className="text-sm font-bold mt-1">
+              {(log.water_ml / 1000).toFixed(1)}L
+              <span className="text-gray-400 font-normal"> / {(goalMl / 1000).toFixed(1)}L</span>
+            </p>
+            <div className="flex items-center justify-center gap-3 mt-2">
+              <button onClick={() => addWater(-250)} className="w-9 h-9 rounded-full bg-white/70 shadow text-gray-600 text-lg leading-none">−</button>
+              <span className="text-xs text-gray-500">250 ml</span>
+              <button onClick={() => addWater(250)} className="w-9 h-9 rounded-full bg-blue-400 text-white shadow text-lg leading-none">+</button>
+            </div>
+          </div>
           <p className="text-xs text-gray-400 mb-4">
             Water: {(log.water_ml / 1000).toFixed(1)}L / {(goalMl / 1000).toFixed(1)}L
           </p>
@@ -137,16 +149,12 @@ export default function GlowUp() {
               );
             })}
           </div>
-          <div className="flex items-center justify-center gap-3 mt-4">
-            <button onClick={() => addWater(-250)} className="w-9 h-9 rounded-full bg-white/70 shadow text-gray-600 text-lg leading-none">−</button>
-            <span className="text-xs text-gray-500">+250 ml water</span>
-            <button onClick={() => addWater(250)} className="w-9 h-9 rounded-full bg-blue-400 text-white shadow text-lg leading-none">+</button>
-          </div>
         </div>
 
         {/* 4. Today's Skin Focus */}
         <div className="glass-card p-5 rounded-3xl">
-          <h2 className="font-black text-gray-800 text-sm uppercase tracking-wide mb-3">Today's Skin Focus</h2>
+          <h3 className="text-md text-gradient-pink font-bold text-gray-400 uppercase mb-2">Today's Skin Focus</h3>
+          <p className="text-[10px] text-gray-400 mb-3" >Please choose tags to get better recommendations for your skincare routine today</p>
           <div className="flex flex-wrap gap-2">
             {SKIN_FOCUS.map((f) => {
               const active = log.skin_focus.includes(f);
@@ -168,7 +176,7 @@ export default function GlowUp() {
 
         {/* 5. Skincare Ritual */}
         <div className="glass-card p-5 rounded-3xl">
-          <h2 className="font-black text-gray-800 text-sm uppercase tracking-wide mb-4">Skincare Ritual</h2>
+          <h3 className="text-md text-gradient-pink font-bold text-gray-400 uppercase mb-4">Skincare Ritual</h3>
           <div className="space-y-2">
             {SKINCARE_STEPS.map((s, i) => {
               const done = !!log.skincare[s.key];
