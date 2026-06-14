@@ -36,14 +36,10 @@ export default function GlowUp() {
 
   return (
     <AppLayout>
-      <div className="p-6">
-        {/* Background */}
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundColor: PASTE_COLORS[profile?.aura_id] || PASTE_COLORS.healer,
-          }}
-        />
+      <div
+        className="relative min-h-full p-6"
+        style={{ backgroundColor: PASTE_COLORS[profile?.aura_id] || PASTE_COLORS.healer }}
+      >
         {/* 1. Monthly Glow Map */}
         <div className="glass-card p-5 rounded-3xl mb-6">
           <div className="flex justify-between mb-4">

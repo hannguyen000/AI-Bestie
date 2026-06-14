@@ -105,16 +105,11 @@ export default function Home() {
 
   return (
     <AppLayout hideNav={isChatOpen}>
-      <div className="relative h-full w-full overflow-y-auto pb-20 md:pb-0 md:flex-col">
-        {/* Background */}
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundColor: PASTE_COLORS[profile?.aura_id] || PASTE_COLORS.healer,
-          }}
-        />
-
-      <main className="flex-1 h-full overflow-y-auto">
+      <div
+        className="relative h-full w-full overflow-y-auto pb-20 md:pb-0"
+        style={{ backgroundColor: PASTE_COLORS[profile?.aura_id] || PASTE_COLORS.healer }}
+      >
+        <main className="flex-1 h-full overflow-y-auto">
         <div className="max-w-3xl mx-auto p-2 overflow-y-auto">
           {/* Chat Widget Card */}
           <div

@@ -24,11 +24,9 @@ return (
     <AppLayout>
       {/* Background */}
       <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundColor: PASTE_COLORS[profile?.aura_id] || PASTE_COLORS.healer,
-        }}
-      />
+        className="relative min-h-full p-6"
+        style={{ backgroundColor: PASTE_COLORS[profile?.aura_id] || PASTE_COLORS.healer }}
+      >
       <div className="p-6 space-y-6">
         {/* 1. Graphical Monthly Insight */}
         <div className="glass-card p-5 rounded-3xl h-64 bg-white/40">
@@ -60,6 +58,7 @@ return (
           <a href="#" className="block text-right text-xs text-gray-400 mt-3 underline">History &gt;</a>
         </div>
       </div>
+    </div>
     </AppLayout>
   );
 }
