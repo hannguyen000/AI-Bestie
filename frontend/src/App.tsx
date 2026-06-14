@@ -13,6 +13,7 @@ import Profile from "./pages/profile";
 import GlowUp from "./pages/glow_up";
 import Health from "./pages/health";
 import Closet from "./pages/closet";
+import PeriodSetup from "./pages/period_setup";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             <Route path={ROUTES.GLOW_UP} element={<GlowUp />} />
             <Route path={ROUTES.HEALTH} element={<Health />} />
             <Route path={ROUTES.CLOSET} element={<Closet />} />
+            <Route path={ROUTES.PERIOD_SETUP} element={<PeriodSetup />} />
           </Routes>
         </div>
       </AuthProvider>

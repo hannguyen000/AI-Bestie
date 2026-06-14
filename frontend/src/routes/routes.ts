@@ -9,6 +9,7 @@ export const ROUTES = {
   HEALTH: "/health",
   CLOSET: "/closet",
   PROFILE: "/profile",
+  PERIOD_SETUP: "/period-setup",
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

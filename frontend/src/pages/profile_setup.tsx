@@ -1,29 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../config/supabase";
 import { updateProfile } from "../services/profileService";
 import { Sparkles, Spinner, ErrorMessage } from "../components/illusttration";
+import { STYLES } from "../components/styles";
 
-const STYLES = [
-  { name: "Classic", emoji: "🏛️", bg: "bg-[#FDF6E3]", text: "text-[#A08852]" },
-  { name: "Corloful", emoji: "🎨", bg: "bg-[#E3F2FD]", text: "text-[#1976D2]" },
-  { name: "Y2K", emoji: "🕹️", bg: "bg-[#E0F7FA]", text: "text-[#00ACC1]" },
-  { name: "Cute", emoji: "🎀", bg: "bg-[#FFF0F5]", text: "text-[#DB7093]" },
-  { name: "Sporty", emoji: "⚽", bg: "bg-[#E8F5E9]", text: "text-[#43A047]" },
-  { name: "Office", emoji: "💼", bg: "bg-[#ECEFF1]", text: "text-[#546E7A]" },
-  { name: "Trendy", emoji: "✨", bg: "bg-[#F3E5F5]", text: "text-[#8E24AA]" },
-  { name: "Street", emoji: "🏙️", bg: "bg-[#EFEBE9]", text: "text-[#6D4C41]" },
-  { name: "Pastel", emoji: "🎨", bg: "bg-[#FFFDE7]", text: "text-[#FBC02D]" },
-  { name: "Harmonious", emoji: "🎵", bg: "bg-[#FBE9E7]", text: "text-[#F4511E]" },
-  { name: "Elegant", emoji: "👗", bg: "bg-[#F3E5F5]", text: "text-[#7B1FA2]" },
-  { name: "Bold", emoji: "💥", bg: "bg-[#FFEBEE]", text: "text-[#D32F2F]" },
-  { name: "Minimalist", emoji: "★", bg: "bg-[#FAFAFA]", text: "text-[#212121]" },
-  { name: "Vintage", emoji: "🕰️", bg: "bg-[#EFEBE9]", text: "text-[#5D4037]" },
-  { name: "Bohemian", emoji: "🎸", bg: "bg-[#FFF3E0]", text: "text-[#E64A19]" },
-  { name: "Chic", emoji: "👠", bg: "bg-[#F1F8E9]", text: "text-[#388E3C]" },
-  { name: "Preppy", emoji: "🎒", bg: "bg-[#E3F2FD]", text: "text-[#1976D2]" },
-  { name: "Gothic", emoji: "💀", bg: "bg-[#212121]", text: "text-[#FFFFFF]" },
-];
+const parseStyles = (raw: any): string[] => {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+    return raw.split(",").map((s) => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
 export default function ProfileSetup() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -37,7 +30,6 @@ export default function ProfileSetup() {
   const [error, setError] = useState<string | null>(null);
 
   const handleUpdate = async () => {
-    setLoading(true);
     setError(null);
 
     if (!formData.weight || parseFloat(formData.weight) <= 0) {
@@ -71,7 +63,7 @@ export default function ProfileSetup() {
         styles: formData.styles,
       });
 
-      navigate("/home");
+      navigate("/period-setup");
     } catch (err: any) {
       console.error("Error updating profile:", err);
       setError("Something went wrong. Please try again!");
@@ -128,6 +120,28 @@ export default function ProfileSetup() {
             return prev;
         });
     };
+
+    useEffect(() => {
+      (async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data } = await supabase
+          .from("profiles")
+          .select("weight, height, age, styles")
+          .eq("id", user.id)
+          .single();
+
+        if (data) {
+          setFormData({
+            weight: data.weight != null ? String(data.weight) : "",
+            height: data.height != null ? String(data.height) : "",
+            age: data.age != null ? String(data.age) : "",
+            styles: parseStyles(data.styles),
+          });
+        }
+      })();
+    }, []);
 
   return (
     <div className="relative flex flex-col h-full overflow-y-auto overflow-x-hidden p-6 bg-linear-to-br from-[#FFF7FA] to-[#F1F9FD]">

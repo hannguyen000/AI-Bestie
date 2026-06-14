@@ -5,12 +5,26 @@ import { supabase } from "../config/supabase";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../services/authService";
+import { STYLES } from "../components/styles";
+import { getCycleInfo } from "../components/cycle";
 
 import { 
   CHARACTER_IMAGES_WITHOUT_BG, 
   CHARACTER_BACKGROUNDS,
   PASTE_COLORS,
 } from "../config/auraConfig";
+
+const parseStyles = (raw: any): string[] => {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);          // trường hợp '["Classic","Y2K"]'
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+    return raw.split(",").map((s) => s.trim()).filter(Boolean); // trường hợp "Classic,Y2K"
+  }
+  return [];
+};
 
 export default function Profile() {
     const [profile, setProfile] = useState<any>(null);
@@ -20,6 +34,10 @@ export default function Profile() {
     : "0.0";
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
+    // State for editing styles in profile
+    const [editingTags, setEditingTags] = useState(false);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [savingTags, setSavingTags] = useState(false);
 
     useEffect(() => {
     async function fetchData() {
@@ -32,7 +50,47 @@ export default function Profile() {
     }
     fetchData();
     }, []);
+
+    // sync selectedTags with profile styles when profile data changes
+    useEffect(() => {
+      setSelectedTags(parseStyles(profile?.styles));
+    }, [profile?.styles]);
+
+    const toggleTag = (name: string) => {
+      setSelectedTags((prev) => {
+        const arr = Array.isArray(prev) ? prev : [];
+        return arr.includes(name)
+          ? arr.filter((t) => t !== name)
+          : arr.length < 5 ? [...arr, name] : arr;
+      });
+    };
+
+    const saveTags = async () => {
+      setSavingTags(true);
+      try {
+        const { error } = await supabase
+          .from("profiles")
+          .update({ styles: selectedTags })
+          .eq("id", profile.id);
+        if (error) throw error;
+
+        setProfile({ ...profile, styles: selectedTags }); // update local state immediately, avoid refetching
+        setEditingTags(false);
+      } catch (e) {
+        alert("Error updating styles: " + e);
+      } finally {
+        setSavingTags(false);
+      }
+    };
+
     if (loading) return <div className="flex h-full items-center justify-center">Loading...</div>;
+
+
+    const cycle = getCycleInfo(
+      profile?.last_period_date,
+      profile?.cycle_length,
+      profile?.period_length
+    );
 
     const handleLogout = async () => {
       try {
@@ -111,7 +169,8 @@ export default function Profile() {
           className="w-full h-40 bg-linear-to-r from-pink-300 to-purple-400"
           style={{
             backgroundImage: `url('${CHARACTER_BACKGROUNDS[profile?.aura_id] || CHARACTER_BACKGROUNDS.default}')`, 
-            backgroundPosition: 'center'
+            backgroundPosition: 'center',
+            backgroundSize: 'cover'
           }}
         />
 
@@ -140,41 +199,149 @@ export default function Profile() {
         <h2 className="mt-4 text-xl text-gradient-pink font-black text-gray-800">{profile?.username || "Bestie"}</h2>
       </div>
     
-        {/* 2. Info Card (BMI Scale) */}
-        <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 bg-white/50 mr-5 ml-5">
+      {/* 2. Info Card (BMI Scale) */}
+      <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 bg-white/50 mr-5 ml-5">
         <button onClick={() => navigate('/profile-setup')} className="absolute top-2 right-4 p-2 bg-white rounded-full shadow-lg text-pink-500 border border-gray-100 hover:bg-pink-50 transition-colors">
-            <Pencil size={16} />
+          <Pencil size={16} />
         </button>
-            <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4"> ℹ Info</h3>
-                <div className="grid grid-cols-3 gap-4 mb-8">
-                    {[
-                    { label: "Weight", value: `${profile?.weight || "--"}kg` },
-                    { label: "Height", value: `${profile?.height || "--"}cm` },
-                    { label: "Age", value: profile?.age || "--" },
-                    ].map((item) => (
-                    <div key={item.label} className="glass-card p-4 rounded-3xl text-center shadow-lg">
-                        <p className="text-[10px] text-gray-400 font-bold uppercase">{item.label}</p>
-                        <p className="text-lg font-bold text-gray-800">{item.value}</p>
-                    </div>
-                    ))}
-                </div>
-            
-            <BMIScale bmi={parseFloat(bmi)} />
-            <div className="text-center mt-3">
-                <p className="font-bold text-gray-700">
-                Your BMI is <span className="text-pink-600">{bmi}</span>
-                </p>
-                <p className={`text-xs font-bold mt-1 ${
-                parseFloat(bmi) < 18.5 ? "text-slate-400" :
-                parseFloat(bmi) < 25 ? "text-emerald-500" :
-                parseFloat(bmi) < 30 ? "text-amber-400" : "text-rose-400"
-                }`}>
-                {parseFloat(bmi) < 18.5 ? "Underweight" :
-                parseFloat(bmi) < 25 ? "Healthy" :
-                parseFloat(bmi) < 30 ? "Overweight" : "Obese"}
-                </p>
+        <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4"> ℹ Info</h3>
+
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[
+            { label: "Weight", value: `${profile?.weight || "--"}kg` },
+            { label: "Height", value: `${profile?.height || "--"}cm` },
+            { label: "Age", value: profile?.age || "--" },
+          ].map((item) => (
+            <div key={item.label} className="glass-card p-4 rounded-3xl text-center shadow-lg">
+              <p className="text-[10px] text-gray-400 font-bold uppercase">{item.label}</p>
+              <p className="text-lg font-bold text-gray-800">{item.value}</p>
             </div>
+          ))}
         </div>
+
+        <BMIScale bmi={parseFloat(bmi)} />
+        <div className="text-center mt-3">
+          <p className="font-bold text-gray-700">
+            Your BMI is <span className="text-pink-600">{bmi}</span>
+          </p>
+          <p className={`text-xs font-bold mt-1 ${
+            parseFloat(bmi) < 18.5 ? "text-slate-400" :
+            parseFloat(bmi) < 25 ? "text-emerald-500" :
+            parseFloat(bmi) < 30 ? "text-amber-400" : "text-rose-400"
+          }`}>
+            {parseFloat(bmi) < 18.5 ? "Underweight" :
+            parseFloat(bmi) < 25 ? "Healthy" :
+            parseFloat(bmi) < 30 ? "Overweight" : "Obese"}
+          </p>
+        </div>
+      </div>
+
+      {/* Styles / Tags */}
+      <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 bg-white/50 mr-5 ml-5">
+        <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4"> STYLES</h3>
+        <div className="mb-1">
+          <div className="flex items-center justify-between">
+            {!editingTags ? (
+              <button
+                onClick={() => setEditingTags(true)}
+                className="absolute top-2 right-4 p-2 bg-white rounded-full shadow-lg text-pink-500 border border-gray-100 hover:bg-pink-50 transition-colors"
+              >
+                 <Pencil size={16} />
+              </button>
+            ) : (
+              <div className="flex items-center gap-3">
+                <button
+                onClick={() => { setSelectedTags(parseStyles(profile?.styles)); setEditingTags(false); }}                  
+                className="text-gray-400 text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveTags}
+                  disabled={savingTags || selectedTags.length === 0}
+                  className="absolute top-10 right-4 p-2 text-pink-500 border border-gray-100 hover:bg-pink-50 transition-colors"
+                >
+                  {savingTags ? "Saving..." : "Save"}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+          <div className="flex flex-wrap gap-2">
+            {(editingTags ? STYLES : STYLES.filter((s) => selectedTags.includes(s.name))).map((s) => {
+              const isSelected = selectedTags.includes(s.name);
+
+              if (!editingTags) {
+                return (
+                  <span
+                    key={s.name}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border-2 border-current flex items-center gap-1 ${s.bg} ${s.text}`}
+                  >
+                    <span>{s.emoji}</span>{s.name}
+                  </span>
+                );
+              }
+
+              return (
+                <button
+                  key={s.name}
+                  type="button"
+                  onClick={() => toggleTag(s.name)}
+                  disabled={selectedTags.length >= 5 && !isSelected}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-all flex items-center gap-1
+                    ${isSelected
+                      ? `${s.bg} ${s.text} border-current shadow scale-105`
+                      : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"}
+                    ${selectedTags.length >= 5 && !isSelected ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  <span>{s.emoji}</span>{s.name}
+                </button>
+              );
+            })}
+
+            {!editingTags && selectedTags.length === 0 && (
+              <span className="text-xs text-gray-400">No styles selected yet</span>
+            )}
+          </div>
+        </div>
+
+      {/* Period */}
+      <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/50 mr-5 ml-5 mb-6 relative">
+        <button
+          onClick={() => navigate('/period-setup')}
+          className="absolute top-2 right-4 p-2 bg-white rounded-full shadow-lg text-pink-500 border border-gray-100 hover:bg-pink-50 transition-colors"
+        >
+          <Pencil size={16} />
+        </button>
+        <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4">🌸 Period</h3>
+
+        {cycle ? (
+          <div className="flex items-center justify-around text-center">
+            <div>
+              <p className="text-2xl font-bold text-rose-500">{cycle.cycleDay}</p>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Cycle day</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-pink-600">{cycle.daysUntilNext}</p>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Days to period</p>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-700">
+                {cycle.nextDate.toLocaleDateString()}
+              </p>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Next period</p>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center">
+            <p className="text-sm text-gray-400 mb-3">No cycle data yet</p>
+            <button onClick={() => navigate('/period-setup')} className="text-xs bg-white px-4 py-1 rounded-full shadow">
+              Set up now
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* 3. Badges & Achievements */}
       <div className="glass-card p-6 rounded-3xl shadow-lg mb-6 mr-5 ml-5 bg-white/50">

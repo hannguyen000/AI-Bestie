@@ -10,6 +10,8 @@ import {
   PASTE_COLORS,
 } from "../config/auraConfig";
 import { useOutfitBoard } from "../hooks/outfitBoard";
+import { getCycleInfo } from "../components/cycle";
+
 
 export default function Home() {
   const [profile, setProfile] = useState<any>(null);
@@ -30,6 +32,12 @@ export default function Home() {
     title,
     loading: boardLoading
   } = useOutfitBoard(profile);
+
+  const cycle = getCycleInfo(
+    profile?.last_period_date,
+    profile?.cycle_length,
+    profile?.period_length
+  );
 
   // Send message 
   const handleSendMessage = async () => {
@@ -160,8 +168,26 @@ export default function Home() {
                 CYCLE TRACKER
               </h2>
               <CalendarDays className="mx-auto mb-2 text-pink-400" />
-              <p className="text-sm font-bold">Day 5</p>
-              <p className="text-[10px] text-gray-400 md:text-sm">Cycle Tracker</p>
+              {cycle ? (
+                cycle.isOnPeriod ? (
+                  <>
+                    <p className="text-xl font-bold text-rose-500">Day {cycle.cycleDay}</p>
+                    <p className="text-[10px] text-gray-400 md:text-sm">On your period</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xl font-bold">{cycle.daysUntilNext}</p>
+                    <p className="text-[10px] text-gray-400 md:text-sm">
+                      {cycle.daysUntilNext === 1 ? "day" : "days"} until period
+                    </p>
+                  </>
+                )
+              ) : (
+                <>
+                  <p className="text-sm font-bold">--</p>
+                  <p className="text-[10px] text-gray-400 md:text-sm">Set up cycle</p>
+                </>
+              )}
             </div>
           </div>
 
