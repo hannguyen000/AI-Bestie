@@ -376,7 +376,7 @@ export default function Profile() {
       </div>
 
       {/* 5. App Settings */}
-      <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/50 mr-5 ml-5 mb-10">
+      <div className="glass-card p-6 rounded-3xl shadow-lg border border-pink-100 bg-white/50 mr-5 ml-5 mb-15">
         <h3 className="text-xs text-gradient-pink font-bold text-gray-400 uppercase mb-4">⚙️ App Settings</h3>
         <div className="space-y-4">
         <button className="flex items-center gap-3 text-sm text-gray-700"><span>🌐</span> Language</button>
@@ -385,7 +385,7 @@ export default function Profile() {
         
         <button 
           onClick={handleLogout}
-          className="w-full mt-4 py-2 bg-white/50 hover:bg-white/80 rounded-full text-sm font-bold text-red-700 shadow transition-all"
+          className="w-full mt-4 py-2 bg-white/50 hover:bg-white/80 rounded-full text-sm font-bold text-red-700 shadow transition-all mb-5"
         >
           Logout
         </button>
