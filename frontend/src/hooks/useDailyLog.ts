@@ -8,7 +8,8 @@ export type DailyLog = {
   habits: Record<string, boolean>;
   skincare: Record<string, boolean>;
   skin_focus: string[];
-  last_drank_at?: string | null;   
+  last_drank_at?: string | null;
+  mood?: number | null;            // thêm
 };
 
 export function useDailyLog() {
@@ -84,7 +85,12 @@ export function useDailyLog() {
         persist(next);
         return next;
     });
+    
+  const setMood = (value: number) =>
+    setLog((prev) => {
+      const next = { ...prev, mood: value };
+      persist(next); return next;
+    });
 
-
-  return { log, loading, addWater, toggleHabit, toggleSkincare, toggleSkinFocus };
+  return { log, loading, addWater, toggleHabit, toggleSkincare, toggleSkinFocus, setMood };
 }
