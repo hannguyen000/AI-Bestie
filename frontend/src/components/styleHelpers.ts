@@ -13,29 +13,32 @@ export function getWeatherLabel(weather: any): string {
 
 export async function fetchOutfitCaption(
   weatherLabel: string,
-  styleTags: string[],
+  tags: string[],
+  wardrobeText: string,
   groqKey: string
 ): Promise<string> {
-  const prompt = `The weather today is ${weatherLabel}. The user's fashion style is: ${styleTags.join(", ")}. 
-Write ONE short, fun, gen-Z bestie sentence (max 15 words) suggesting a cute outfit for today. 
-No hashtags. Just the sentence.`;
+  const styleText = tags.length ? tags.join(", ") : "phong cách của bạn";
+  const owns = wardrobeText
+    ? `The user has these items available in their closet: ${wardrobeText}. Prioritize styling suggestions using strictly these items.`
+    : "";
 
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${groqKey}`,
-    },
-    body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 60,
-      temperature: 0.9,
-    }),
-  });
-  const data = await res.json();
-  console.log("Groq response:", data); 
-  return data.choices?.[0]?.message?.content?.trim() ?? "Style it your way today! ✨";
+  const prompt = `You are a friendlz stylist. Suggest EXACTLY ONE short, fashionable caption/outfit idea (maximum 20 words) that fits the current weather (${weatherLabel}) and the style: ${styleText}. ${owns} Respond in natural English, no emojis.`;
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${groqKey}` },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 80,
+        temperature: 0.8,
+      }),
+    });
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content?.trim() || "Style it your way today!";
+  } catch {
+    return "Style it your way today!";
+  }
 }
 
 export const STYLE_QUERY_MAP: Record<string, string> = {

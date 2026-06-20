@@ -8,6 +8,7 @@ import {
 import { useOutfitBoard } from "../hooks/outfitBoard";
 import { motion, AnimatePresence } from "framer-motion";
 import { WARDROBE_CATEGORIES, WARDROBE_COLORS, SEASONS, type ClosetItem } from "../config/wardrobe";
+import { OutfitDiscovery } from "../components/OutfitDiscovery";
 
 const OTHER_BOARDS: Record<string, string[]> = {
   "Mood": [
@@ -26,26 +27,22 @@ const OTHER_BOARDS: Record<string, string[]> = {
 export default function Closet() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isClosetOpen, setIsClosetOpen] = useState(false);
 
   const [wardrobe, setWardrobe] = useState<ClosetItem[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [form, setForm] = useState({ category: "tops", name: "", color: "", season: "" });
 
-  const toggleItem = (item: string) => {
-    setSelectedItems(prev => 
-      prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
-    );
-  };
+  type Collection = { id: string; name: string; outfits: string[] };
 
-  const {
-    weather,
-    images,
-    caption,
-    title,
-    loading: boardLoading
-  } = useOutfitBoard(profile);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [showDiscovery, setShowDiscovery] = useState(false);
+
+const colorName = (hex?: string) => WARDROBE_COLORS.find((c) => c.hex === hex)?.name;
+const wardrobeForBoard = wardrobe.map((w) => ({ name: w.name, color: colorName(w.color) }));
+
+const { weather, images, caption, title, loading: boardLoading } =
+  useOutfitBoard(profile, wardrobeForBoard);  
 
   const temp = weather ? Math.round(weather.main?.temp) : null;
 
@@ -57,6 +54,7 @@ export default function Closet() {
         setProfile(data);
         setUserId(user.id);
         setWardrobe(data?.wardrobe ?? []);
+        setCollections(data?.collections ?? []);
       }
       setLoading(false);
       
@@ -83,6 +81,21 @@ export default function Closet() {
   };
 
   const removeItem = (id: string) => saveWardrobe(wardrobe.filter((w) => w.id !== id));
+
+  const saveCollections = async (next: Collection[]) => {
+    setCollections(next);
+    if (userId) await supabase.from("profiles").update({ collections: next }).eq("id", userId);
+  };
+
+  const addToCollection = (id: string, url: string) =>
+    saveCollections(collections.map((c) =>
+      c.id === id ? { ...c, outfits: c.outfits.includes(url) ? c.outfits : [...c.outfits, url] } : c
+    ));
+
+  const createCollection = (name: string, url: string) =>
+    saveCollections([...collections, { id: `col_${Date.now()}`, name, outfits: [url] }]);
+
+  const discoveryPool = images.length ? images : Object.values(OTHER_BOARDS).flat();
 
 return (
   <AppLayout>
@@ -150,11 +163,11 @@ return (
 
             {/* Board title tag */}
             {!boardLoading && title && (
-              <div className="mb-2 md:mb-10">
+              <div className="mb-2 md:mb-5">
                 <span
-                  className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white md:text-sm"
+                  className="text-[9px] font-bold py-0.5 rounded-full md:text-sm"
                   style={{
-                    backgroundColor: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer,
+                    color: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer,
                     opacity: 0.85,
                   }}
                 >
@@ -162,7 +175,11 @@ return (
                 </span>
               </div>
             )}
-
+            
+            <button onClick={() => setShowDiscovery(true)}
+              className="mb-5 w-full bg-linear-to-r from-pink-400 to-purple-400 text-white font-bold text-sm py-2 rounded-full shadow-lg shadow-pink-200 hover:scale-[1.02] active:scale-95 transition-transform">
+              ✨ Discover outfits
+            </button>
             {/* Images */}
             <div className="flex gap-2">
               {boardLoading
@@ -188,26 +205,26 @@ return (
           {/* Collection of other outfit boards */}
           <div className="flex flex-col glass-card p-5 rounded-3xl mt-4 shadow-lg mx-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-gradient-pink md:text-lg mb-3">COLLECTION</h3>
-            <div className="flex gap-4 mt-2 overflow-x-auto pb-4 scrollbar-hide">
-              {Object.entries(OTHER_BOARDS).map(([boardName, boardItems]) => (
-                <div key={boardName} className="shrink-0 w-32">
-                  {/* Container ảnh collection */}
-                  <div className="grid grid-cols-2 gap-1 w-32 h-32 bg-white/40 p-1 rounded-2xl border border-white/50 shadow-sm overflow-hidden">
-                    {boardItems.slice(0, 4).map((imgUrl, i) => (
-                      <img 
-                        key={i} 
-                        src={imgUrl} 
-                        alt="collection item" 
-                        className="w-full h-full object-cover rounded-md"
-                      />
-                    ))}
+            {collections.length ? (
+              <div className="flex gap-4 mt-2 overflow-x-auto pb-4 scrollbar-hide">
+                {collections.map((c) => (
+                  <div key={c.id} className="shrink-0 w-32">
+                    <div className="grid grid-cols-2 gap-1 w-32 h-32 bg-white/40 p-1 rounded-2xl border border-white/50 overflow-hidden">
+                      {c.outfits.slice(0, 4).map((u, i) => (
+                        <img key={i} src={u} alt="" className="w-full h-full object-cover rounded-md" />
+                      ))}
+                      {c.outfits.length === 0 && (
+                        <div className="col-span-2 flex items-center justify-center text-gray-300 text-xs">empty</div>
+                      )}
+                    </div>
+                    <h3 className="text-xs font-bold text-gray-800 mt-2 truncate text-center">{c.name}</h3>
+                    <p className="text-[10px] text-gray-400 text-center">{c.outfits.length} outfits</p>
                   </div>
-                  <h3 className="text-xs font-bold text-gray-800 mt-2 truncate text-center">
-                    {boardName}
-                  </h3>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-gray-400 mt-2">No collections yet — save outfits from Outfits Discovery.</p>
+            )}
           </div>
 
         {/* Closet Fullscreen Modal */}
@@ -228,8 +245,7 @@ return (
               <div className="relative z-10 flex flex-col h-full">
                 {/* Header*/}
                 <div className="flex justify-between items-center px-6 py-4">
-                  <button onClick={() => setIsClosetOpen(false)} className="text-sm font-bold text-gray-700">Save</button>
-                  <h1 className="text-lg font-bold text-gray-800 mt-10">MY CLOSET</h1>
+                  <h1 className="text-lg font-bold text-gray-800 mt-10 text-center">MY CLOSET</h1>
                   <button onClick={() => setIsClosetOpen(false)} className="text-sm font-bold text-gray-700">Close</button>
                 </div>
 
@@ -237,11 +253,12 @@ return (
                   {/* Add item */}
                   <div className="glass-card p-4 rounded-2xl mb-6 bg-white/60">
                     <p className="text-xs font-bold text-gray-600 mb-3">Add an item</p>
-                    <div className="flex gap-2 mb-3">
+                    <div className="flex flex-col sm:flex-row gap-2 mb-3 w-full">
                       <select value={form.category} onChange={(e) => setForm({ ...form, name: "", category: e.target.value })}
                         className="flex-1 p-2 rounded-xl border border-gray-200 bg-white text-sm">
                         {WARDROBE_CATEGORIES.map((c) => <option key={c.key} value={c.key}>{c.emoji} {c.label}</option>)}
                       </select>
+                      
                       <input list="wardrobe-sugg" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
                         placeholder="Item name" className="flex-[2] p-2 rounded-xl border border-gray-200 bg-white text-sm" />
                       <datalist id="wardrobe-sugg">
@@ -304,6 +321,14 @@ return (
             </motion.div>
           )}
         </AnimatePresence>
+        <OutfitDiscovery
+          open={showDiscovery}
+          onClose={() => setShowDiscovery(false)}
+          images={discoveryPool}
+          collections={collections}
+          onAddToCollection={addToCollection}
+          onCreateCollection={createCollection}
+        />
         </div>
       </main>
     </AppLayout>
