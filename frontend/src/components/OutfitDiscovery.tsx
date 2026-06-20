@@ -1,6 +1,8 @@
 import { useState } from "react";
 
-export function OutfitDiscovery({ open, onClose, images, collections, onAddToCollection, onCreateCollection }: {
+export function OutfitDiscovery({
+  open, onClose, images, collections, onAddToCollection, onCreateCollection,
+}: {
   open: boolean;
   onClose: () => void;
   images: string[];
@@ -12,13 +14,12 @@ export function OutfitDiscovery({ open, onClose, images, collections, onAddToCol
   const [showSave, setShowSave] = useState(false);
   const [newName, setNewName] = useState("");
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
+
   if (!open) return null;
 
   const url = images[index] ?? "";
   const next = () => { setShowSave(false); setIndex((i) => (i + 1) % Math.max(images.length, 1)); };
-
   const flash = (label: string) => { setSavedMsg(`Saved to ${label}`); setTimeout(() => setSavedMsg(null), 1500); };
-
   const handleAdd = (id: string, name: string) => { onAddToCollection(id, url); setShowSave(false); flash(name); };
   const handleCreate = () => {
     if (!newName.trim()) return;

@@ -38,13 +38,39 @@ export default function Closet() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [showDiscovery, setShowDiscovery] = useState(false);
 
-const colorName = (hex?: string) => WARDROBE_COLORS.find((c) => c.hex === hex)?.name;
-const wardrobeForBoard = wardrobe.map((w) => ({ name: w.name, color: colorName(w.color) }));
+  const colorName = (hex?: string) => WARDROBE_COLORS.find((c) => c.hex === hex)?.name;
+  const wardrobeForBoard = wardrobe.map((w) => ({ name: w.name, color: colorName(w.color) }));
 
-const { weather, images, caption, title, loading: boardLoading } =
-  useOutfitBoard(profile, wardrobeForBoard);  
+  const { weather, images, caption, title, loading: boardLoading } =
+    useOutfitBoard(profile, wardrobeForBoard);  
 
   const temp = weather ? Math.round(weather.main?.temp) : null;
+
+  const [discoveryImages, setDiscoveryImages] = useState<string[]>([]);
+
+  const openDiscovery = async () => {
+    setShowDiscovery(true);
+    try {
+      const tags: string[] = JSON.parse(profile?.styles ?? "[]");
+      const pexelsKey = import.meta.env.VITE_PEXELS_ACCESS_KEY;
+      const query = (tags.length ? tags.join(" ") : "casual") + " outfit fashion";
+      const page = Math.floor(Math.random() * 5) + 1; // trang ngẫu nhiên cho đa dạng
+
+      const res = await fetch(
+        `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=80&page=${page}&orientation=portrait`,
+        { headers: { Authorization: pexelsKey } }
+      );
+      const data = await res.json();
+      const urls = (data.photos ?? [])
+        .map((p: any) => p.src?.large || p.src?.medium)
+        .filter(Boolean)
+        .sort(() => Math.random() - 0.5); // xáo trộn
+
+      setDiscoveryImages(urls);
+    } catch (e) {
+      console.error("discovery fetch:", e);
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -95,7 +121,9 @@ const { weather, images, caption, title, loading: boardLoading } =
   const createCollection = (name: string, url: string) =>
     saveCollections([...collections, { id: `col_${Date.now()}`, name, outfits: [url] }]);
 
-  const discoveryPool = images.length ? images : Object.values(OTHER_BOARDS).flat();
+  const discoveryPool = discoveryImages.length
+    ? discoveryImages
+    : (images.length ? images : Object.values(OTHER_BOARDS).flat());
 
 return (
   <AppLayout>
@@ -154,9 +182,9 @@ return (
 
             {/* AI Caption */}
             {boardLoading ? (
-              <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse mb-3" />
+              <div className="h-3 w-2/3 bg-gray-200 md:mb-2 rounded animate-pulse" />
             ) : (
-              <p className="text-[11px] text-gray-500 mb-3 italic leading-relaxed md:text-sm">
+              <p className="text-[11px] text-gray-500 md:mb-2 italic leading-relaxed md:text-sm">
                 {caption}
               </p>
             )}
@@ -176,7 +204,7 @@ return (
               </div>
             )}
             
-            <button onClick={() => setShowDiscovery(true)}
+            <button onClick={openDiscovery}
               className="mb-5 w-full bg-linear-to-r from-pink-400 to-purple-400 text-white font-bold text-sm py-2 rounded-full shadow-lg shadow-pink-200 hover:scale-[1.02] active:scale-95 transition-transform">
               ✨ Discover outfits
             </button>
