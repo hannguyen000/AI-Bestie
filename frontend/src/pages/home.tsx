@@ -14,7 +14,7 @@ import { useDailyLog } from "../hooks/useDailyLog";
 import { WaterRing } from "../components/WaterRing";
 import PeriodCalendar from "../components/PeriodCalendar";
 import { getCycleInfo, isPeriodDay as isPeriodDayBase, savePeriodDate } from "../components/cycle";
-
+import { getPhase, HOME_CYCLE_TIPS, WATER_NUDGE } from "../config/cycleTips";
 
 function timeAgo(iso?: string | null) {
   if (!iso) return null;
@@ -56,6 +56,18 @@ export default function Home() {
   const goalMl = profile?.weight ? Math.round(profile.weight * 33) : 2000; // ~33ml/kg
   const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
 
+  const auraId = profile?.aura_id || "healer";
+  const phase = getPhase(cycle);
+  const hour = new Date().getHours();
+  const greeting = `Hey ${profile?.username || "Bestie"}!`;
+  const cycleTip = (HOME_CYCLE_TIPS[auraId] || {})[phase];
+
+  const tip =
+    cycleTip                                 
+    ?? (waterPct < 60 && hour >= 11            
+          ? WATER_NUDGE[auraId] || WATER_NUDGE.healer
+          : "How are you today?"); 
+          
   const [showCalendar, setShowCalendar] = useState(false);
 
   const isPeriodDay = (d: Date) =>
@@ -159,14 +171,20 @@ export default function Home() {
               />
               <div className="flex-1 pr-3">
                 <p
-                  className="text-xs font-medium mb-5 md:text-lg md:ml-10"
+                  className="text-sm font-bold md:text-lg md:ml-10"
                   style={{ color: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer }}
                 >
-                  Hey {profile?.username || "Bestie"}. How are you today?
+                  {greeting}
+                </p>
+                <p
+                  className="text-xs font-medium mb-4 md:text-base md:ml-10"
+                  style={{ color: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer }}
+                >
+                  {tip}
                 </p>
                 <button
                   onClick={() => setIsChatOpen(true)}
-                  className="bg-white px-13 md:px-20 py-1 rounded-full text-xs font-bold shadow-md hover:scale-105 transition-transform md:text-lg md:ml-10"
+                  className="bg-white px-13 md:px-50 py-1 rounded-full text-xs font-bold shadow-md hover:scale-105 transition-transform md:text-md md:ml-10"
                   style={{ color: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer }}
                 >
                   Start to chat
