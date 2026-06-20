@@ -250,14 +250,13 @@ export default function Home() {
 
           {/* Pinterest Style Board */}
           <div className="glass-card p-5 rounded-3xl mt-4 shadow-lg mx-2">
-            {/* Header */}
-            <div className="items-center justify-between text-center">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gradient-pink md:text-lg -mb-3">
+             {/* Header */}
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gradient-pink md:text-lg">
                 YOUR PINTEREST PICK TODAY
               </h3>
-              <br />
               {temp !== null && (
-                <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap">
+                <span className="text-[10px] text-gray-400 font-medium md:text-sm">
                   {temp}°C · {weather?.weather?.[0]?.description}
                 </span>
               )}
@@ -265,9 +264,9 @@ export default function Home() {
 
             {/* AI Caption */}
             {boardLoading ? (
-              <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse mb-2" />
+              <div className="h-3 w-2/3 bg-gray-200 md:mb-2 rounded animate-pulse" />
             ) : (
-              <p className="text-[11px] text-gray-500 mb-3 italic leading-relaxed md:text-sm">
+              <p className="text-[11px] text-gray-500 md:mb-2 italic leading-relaxed md:text-sm">
                 {caption}
               </p>
             )}
@@ -286,7 +285,7 @@ export default function Home() {
                 </span>
               </div>
             )}
-
+            
             {/* Images */}
             <div className="flex gap-2">
               {boardLoading

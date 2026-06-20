@@ -42,16 +42,17 @@ export async function fetchOutfitCaption(
 }
 
 export const STYLE_QUERY_MAP: Record<string, string> = {
-  Cute:        "full outfit idea korean cute girl ootd",
-  Trendy:      "full outfit idea korean trendy street style ootd",
-  Sporty:      "full outfit idea korean sporty chic ootd",
-  Office:      "full outfit idea korean office fashion women elegant",
-  Street:      "full outfit idea korean streetwear urban style ootd",
-  Harmonious:  "full outfit idea korean soft aesthetic pastel fashion",
-  Minimalist:  "full outfit idea korean minimalist clean aesthetic fashion",
-  Y2K:         "full outfit idea korean y2k fashion aesthetic",
-  Boho:        "full outfit idea korean boho chic aesthetic",
-  Vintage:     "full outfit idea korean vintage retro aesthetic",
+  Cute:        "outfit idea trendy ulzzang cute young woman ootd",
+  Trendy:      "full outfit idea trendy korean young woman ootd",
+  Sporty:      "full outfit idea sporty young woman ootd",
+  Office:      "full outfit idea ulzzang office fashion young women elegant",
+  Street:      "full outfit idea streetwear urban style ootd young woman",
+  Harmonious:  "full outfit idea soft aesthetic pastel fashion young woman",
+  Minimalist:  "full outfit idea minimalist clean young woman",
+  Y2K:         "full outfit idea y2k fashion aesthetic young woman",
+  Boho:        "full outfit idea boho chic aesthetic young woman",
+  Vintage:     "full outfit idea vintage retro aesthetic young woman",
+  Sexy:        "full outfit idea sexy young woman"
 };
 
 export function getAgeGroup(age: number): string {
