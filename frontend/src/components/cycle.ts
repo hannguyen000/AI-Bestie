@@ -1,3 +1,5 @@
+import { supabase } from "../config/supabase";
+
 export type CycleInfo = {
   cycleDay: number;       // current day in cycle (1-based)
   daysUntilNext: number;  // days until next cycle starts
@@ -34,4 +36,28 @@ export function getCycleInfo(
   const isOnPeriod = cycleDay <= pl;
 
   return { cycleDay, daysUntilNext, nextDate, isOnPeriod };
+}
+
+export function isPeriodDay(
+  date: Date,
+  lastPeriod?: string | null,
+  cycleLength = 28,
+  periodLength = 5
+): boolean {
+  if (!lastPeriod) return false;
+  const start = new Date(lastPeriod); start.setHours(0, 0, 0, 0);
+  const day = new Date(date); day.setHours(0, 0, 0, 0);
+  const diff = Math.floor((day.getTime() - start.getTime()) / 86400000);
+  if (diff < 0) return false;
+  return (((diff % cycleLength) + cycleLength) % cycleLength) < periodLength;
+}
+
+export async function savePeriodDate(dateStr: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not logged in" };
+  const { error } = await supabase
+    .from("profiles")
+    .update({ last_period_date: dateStr })
+    .eq("id", user.id);
+  return { error };
 }

@@ -78,7 +78,7 @@ return (
 
     {/* Main Content */}
     <main className="relative z-10 h-full w-full overflow-y-auto pb-20">
-      <div className="max-w-3xl mx-auto p-2">
+      <div className="max-w-5xl mx-auto p-2">
         
         {/* Closet Items */}
         <div className="flex flex-col glass-card p-5 rounded-3xl mt-4 shadow-lg mx-2">

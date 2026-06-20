@@ -2,20 +2,23 @@ import { useState, useEffect } from "react";
 import { supabase } from "../config/supabase";
 import AppLayout from "../layouts/appLayout";
 import { PASTE_COLORS } from "../config/auraConfig";
-import { getCycleInfo } from "../components/cycle";
 import { useDailyLog } from "../hooks/useDailyLog";
+import PeriodCalendar from "../components/PeriodCalendar";
+import { MOOD_BY_VALUE } from "../components/PeriodCalendar";
+import { getCycleInfo, isPeriodDay as isPeriodDayBase, savePeriodDate } from "../components/cycle";
+import { CHARACTER_IMAGES_WITHOUT_BG } from "../config/auraConfig";
+import { getPhase, PHASE_TITLES, AURA_TIPS, SYMPTOMS } from "../config/cycleTips";
 
 const MOODS = [
   { v: 5, e: "😊" }, { v: 4, e: "🙂" }, { v: 3, e: "😐" }, { v: 2, e: "🙁" }, { v: 1, e: "😢" },
 ];
-const MOOD_BY_VALUE = ["", "😢", "🙁", "😐", "🙂", "😊"];
 
 export default function Health() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [moodByDate, setMoodByDate] = useState<Record<string, number>>({});
   const [showCalendar, setShowCalendar] = useState(false);
-  const { log, setMood } = useDailyLog();
+  const { log, setMood, toggleSymptom } = useDailyLog();
 
   const fetchMonth = async (uid: string) => {
     const now = new Date();
@@ -45,23 +48,23 @@ export default function Health() {
 
   const cycle = getCycleInfo(profile?.last_period_date, profile?.cycle_length, profile?.period_length);
 
-  const isPeriodDay = (d: Date) => {
-    if (!profile?.last_period_date) return false;
-    const cl = profile.cycle_length || 28, pl = profile.period_length || 5;
-    const start = new Date(profile.last_period_date); start.setHours(0, 0, 0, 0);
-    const day = new Date(d); day.setHours(0, 0, 0, 0);
-    const diff = Math.floor((day.getTime() - start.getTime()) / 86400000);
-    if (diff < 0) return false;
-    return (((diff % cl) + cl) % cl) < pl;
-  };
+  const phase = getPhase(cycle);
+  const auraId = profile?.aura_id || "healer";
+
+  const isPeriodDay = (d: Date) =>
+    isPeriodDayBase(d, profile?.last_period_date, profile?.cycle_length, profile?.period_length);
 
   const savePeriod = async (dateStr: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      await supabase.from("profiles").update({ last_period_date: dateStr }).eq("id", user.id);
-      setProfile({ ...profile, last_period_date: dateStr });
-    }
+    await savePeriodDate(dateStr);
+    setProfile((p: any) => ({ ...p, last_period_date: dateStr }));
     setShowCalendar(false);
+  };
+
+  const todayStr = new Date().toISOString().split("T")[0];
+
+  const handleMood = (v: number) => {
+    setMood(v);                                        
+    setMoodByDate((prev) => ({ ...prev, [todayStr]: v })); 
   };
 
   const now = new Date();
@@ -73,8 +76,23 @@ export default function Health() {
         className="relative h-full w-full overflow-y-auto pb-20 md:pb-0 space-y-6"
         style={{ backgroundColor: PASTE_COLORS[profile?.aura_id] || PASTE_COLORS.healer }}
       >
-        <div className="max-w-3xl mx-auto p-2 overflow-y-auto">
-        {/* 1. Monthly Insight */}
+        <div className="max-w-5xl mx-auto p-2 overflow-y-auto">
+
+        {/* Mood Tracker */}
+        <div className="glass-card p-5 rounded-3xl bg-white/40 mb-5 mt-5">
+          <h3 className="text-sm text-gray-500 font-medium mb-3">Mood tracker · Today</h3>
+          <div className="flex justify-between items-center gap-2">
+            {MOODS.map((m) => (
+              <button key={m.v} onClick={() => handleMood(m.v)}
+                className={`text-2xl transition-transform ${log.mood === m.v ? "scale-125" : "opacity-60 hover:scale-110"}`}>
+                {m.e}
+              </button>
+            ))}
+          </div>
+          {log.mood && <p className="text-[11px] text-gray-400 text-center mt-3">Saved for today ✓</p>}
+        </div>
+
+        {/* Monthly Insight */}
         <div className="glass-card p-5 rounded-3xl bg-white/40 mt-5">
           <p className="text-[11px] text-gray-500 items-center py-2 mb-3">
             {moodCount > 2
@@ -90,8 +108,8 @@ export default function Health() {
           </button>
         </div>
 
-        {/* 2. Period Tracker */}
-        <div className="glass-card p-5 rounded-3xl bg-white/40 text-center mt-5">
+        {/* Period Tracker */}
+        <div className="glass-card p-5 rounded-3xl bg-white/40 text-center mt-5 mb-15">
           <h3 className="text-sm text-gray-500 font-medium">Period tracker</h3>
           {cycle ? (
             cycle.isOnPeriod ? (
@@ -105,22 +123,65 @@ export default function Health() {
           ) : (
             <p className="text-sm text-gray-400 my-2">No cycle data yet</p>
           )}
-        </div>
-
-        {/* 3. Mood Tracker */}
-        <div className="glass-card p-5 rounded-3xl bg-white/40 mb-5 mt-5">
-          <h3 className="text-sm text-gray-500 font-medium mb-3">Mood tracker · Today</h3>
-          <div className="flex justify-between items-center gap-2">
-            {MOODS.map((m) => (
-              <button key={m.v} onClick={() => setMood(m.v)}
-                className={`text-2xl transition-transform ${log.mood === m.v ? "scale-125" : "opacity-60 hover:scale-110"}`}>
-                {m.e}
-              </button>
-            ))}
+          {/* Period Tips */}
+          {cycle && phase !== "normal" && (
+          <div className="glass-card p-5 rounded-3xl bg-white/40 mt-5">
+            <div className="flex items-center gap-3 mb-3">
+              <img
+                src={CHARACTER_IMAGES_WITHOUT_BG[auraId] || CHARACTER_IMAGES_WITHOUT_BG.healer}
+                className="w-12 h-20 object-contain drop-shadow"
+                alt=""
+              />
+              <div className="text-sm text-gray-600 leading-relaxed">
+                <p>
+                  <span className="text-[11px] font-black text-gray-400 uppercase mr-2 tracking-wider">
+                    {PHASE_TITLES[phase]}:
+                  </span>
+                  
+                  <span className="text-[11px]">
+                    {(AURA_TIPS[auraId] || AURA_TIPS.healer)[phase]}
+                  </span>
+                </p>
+                {phase === "soon"}
+                {phase === "period"}
+                {phase === "ovulation"}
+              </div>
+            </div>
           </div>
-          {log.mood && <p className="text-[11px] text-gray-400 text-center mt-3 mb-10">Saved for today ✓</p>}
+        )}
+          {/* Period Symtoms */}
+          {cycle?.isOnPeriod && (
+            <div className="glass-card p-5 rounded-3xl bg-white/40 mt-5">
+              <h3 className="text-sm text-gray-500 font-medium mb-3">How are you feeling today?</h3>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {SYMPTOMS.map((s) => {
+                  const active = (log.symptoms ?? []).includes(s.key);
+                  return (
+                    <button key={s.key} onClick={() => toggleSymptom(s.key)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all flex items-center gap-1
+                        ${active ? "bg-rose-500 text-white border-rose-500" : "bg-white/60 text-gray-600 border-gray-200"}`}>
+                      <span>{s.emoji}</span>{s.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {(log.symptoms ?? []).length > 0 && (
+                <div className="space-y-2">
+                  {SYMPTOMS.filter((s) => log.symptoms?.includes(s.key)).map((s) => (
+                    <div key={s.key} className="bg-rose-50 rounded-2xl p-3">
+                      <p className="text-xs font-bold text-rose-600 mb-0.5">{s.emoji} {s.label}</p>
+                      <p className="text-[11px] text-gray-600 leading-snug">{s.tip}</p>
+                    </div>
+                  ))}
+                  <p className="text-[10px] text-gray-400 text-center mt-2">
+                  General tips only. Please consult a doctor if you experience severe or persistent pain.                  </p>
+                </div>
+              )}
+            </div>
+          )}
+          </div>
         </div>
-      </div>
 
       <PeriodCalendar
         open={showCalendar}
@@ -179,77 +240,5 @@ function MoodChart({ moodByDate, isPeriodDay, year, month }: {
       <text x={padL} y={H - 4} fontSize="6" fill="#8b9dc3">● mood</text>
       <text x={padL + 30} y={H - 4} fontSize="6" fill="#e11d48">🩸 period</text>
     </svg>
-  );
-}
-
-/* ---- Period log calendar---- */
-function PeriodCalendar({ open, onClose, lastPeriod, isPeriodDay, moodByDate, onSave }: {
-  open: boolean;
-  onClose: () => void;
-  lastPeriod?: string | null;
-  isPeriodDay: (d: Date) => boolean;
-  moodByDate: Record<string, number>;
-  onSave: (dateStr: string) => void;
-}) {
-  const [view, setView] = useState(new Date());
-  const [selected, setSelected] = useState<string | null>(lastPeriod ?? null);
-  if (!open) return null;
-
-  const year = view.getFullYear(), month = view.getMonth();
-  const monthLabel = view.toLocaleString("en-US", { month: "long" });
-  const offset = (new Date(year, month, 1).getDay() + 6) % 7; // Monday-first
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells: (number | null)[] = [...Array(offset).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
-
-  return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="p-5 max-h-[70vh] overflow-y-auto">
-          <div className="flex items-center justify-center gap-8 mb-5">
-            <button onClick={() => setView(new Date(year, month - 1, 1))} className="text-pink-300 text-2xl">‹</button>
-            <h2 className="font-bold text-gray-800 text-lg">{monthLabel}</h2>
-            <button onClick={() => setView(new Date(year, month + 1, 1))} className="text-pink-300 text-2xl">›</button>
-          </div>
-
-          <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-400 mb-2">
-            {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((d) => <div key={d}>{d}</div>)}
-          </div>
-
-          <div className="grid grid-cols-7 gap-1">
-            {cells.map((day, idx) => {
-              if (!day) return <div key={idx} />;
-              const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-              const period = isPeriodDay(new Date(year, month, day));
-              const mood = moodByDate[dateStr];
-              const isSel = selected === dateStr;
-              return (
-                <button key={idx} onClick={() => setSelected(dateStr)}
-                  className={`aspect-square rounded-full flex flex-col items-center justify-center
-                    ${isSel ? "ring-2 ring-pink-500" : ""} ${period ? "bg-rose-100" : ""}`}>
-                  <span className={`text-xs ${period ? "text-rose-600 font-bold" : "text-gray-600"}`}>{day}</span>
-                  <span className="text-[15px] leading-none h-3">{mood ? MOOD_BY_VALUE[mood] : period ? "🩸" : ""}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <p className="text-center text-xs text-gray-400 mt-5">
-            Choose the first day of your period this month, then click "Save".
-          </p>
-        </div>
-
-        <div className="flex justify-between items-center px-5 py-3 border-t border-gray-100">
-          <button onClick={onClose} className="text-gray-500 font-bold text-sm">Cancel</button>
-          <button onClick={() => selected && onSave(selected)} disabled={!selected}
-            className="text-pink-600 font-bold text-sm disabled:opacity-40">Save</button>
-        </div>
-      </div>
-    </div>
   );
 }

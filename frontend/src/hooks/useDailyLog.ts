@@ -9,12 +9,13 @@ export type DailyLog = {
   skincare: Record<string, boolean>;
   skin_focus: string[];
   last_drank_at?: string | null;
-  mood?: number | null;            // thêm
+  mood?: number | null;         
+  symptoms: string[];
 };
 
 export function useDailyLog() {
   const [userId, setUserId] = useState<string | null>(null);
-  const [log, setLog] = useState<DailyLog>({ water_ml: 0, habits: {}, skincare: {}, skin_focus: [], last_drank_at: null });
+  const [log, setLog] = useState<DailyLog>({ water_ml: 0, habits: {}, skincare: {}, skin_focus: [], last_drank_at: null, symptoms: [] });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export function useDailyLog() {
 
       const { data } = await supabase
         .from("daily_logs")
-        .select("water_ml, habits, skincare, skin_focus, last_drank_at")
+        .select("water_ml, habits, skincare, skin_focus, last_drank_at, mood, symptoms")
         .eq("user_id", user.id)
         .eq("log_date", today())
         .maybeSingle();
@@ -37,6 +38,7 @@ export function useDailyLog() {
           skincare: data.skincare ?? {},
           skin_focus: data.skin_focus ?? [],
           last_drank_at: data.last_drank_at ?? null,
+          symptoms: data.symptoms ?? [],
         });
       }
       setLoading(false);
@@ -92,5 +94,15 @@ export function useDailyLog() {
       persist(next); return next;
     });
 
-  return { log, loading, addWater, toggleHabit, toggleSkincare, toggleSkinFocus, setMood };
+  const toggleSymptom = (key: string) =>
+  setLog((prev) => {
+    const has = (prev.symptoms ?? []).includes(key);
+    const next = {
+      ...prev,
+      symptoms: has ? prev.symptoms.filter((s) => s !== key) : [...(prev.symptoms ?? []), key],
+    };
+    persist(next); return next;
+  });
+
+  return { log, loading, addWater, toggleHabit, toggleSkincare, toggleSkinFocus, setMood, toggleSymptom };
 }

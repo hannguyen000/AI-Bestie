@@ -10,9 +10,11 @@ import {
   PASTE_COLORS,
 } from "../config/auraConfig";
 import { useOutfitBoard } from "../hooks/outfitBoard";
-import { getCycleInfo } from "../components/cycle";
 import { useDailyLog } from "../hooks/useDailyLog";
 import { WaterRing } from "../components/WaterRing";
+import PeriodCalendar from "../components/PeriodCalendar";
+import { getCycleInfo, isPeriodDay as isPeriodDayBase, savePeriodDate } from "../components/cycle";
+
 
 function timeAgo(iso?: string | null) {
   if (!iso) return null;
@@ -51,8 +53,19 @@ export default function Home() {
   );
 
   const { log: dailyLog, addWater } = useDailyLog();
-const goalMl = profile?.weight ? Math.round(profile.weight * 33) : 2000; // ~33ml/kg
-const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
+  const goalMl = profile?.weight ? Math.round(profile.weight * 33) : 2000; // ~33ml/kg
+  const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
+
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  const isPeriodDay = (d: Date) =>
+    isPeriodDayBase(d, profile?.last_period_date, profile?.cycle_length, profile?.period_length);
+
+  const savePeriod = async (dateStr: string) => {
+    await savePeriodDate(dateStr);
+    setProfile((p: any) => ({ ...p, last_period_date: dateStr }));
+    setShowCalendar(false);
+  };
 
   // Send message 
   const handleSendMessage = async () => {
@@ -124,11 +137,11 @@ const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
         style={{ backgroundColor: PASTE_COLORS[profile?.aura_id] || PASTE_COLORS.healer }}
       >
         <main className="flex-1 h-full overflow-y-auto">
-        <div className="max-w-3xl mx-auto p-2 overflow-y-auto">
+        <div className="max-w-5xl mx-auto p-2 overflow-y-auto">
           {/* Chat Widget Card */}
           <div
             className="relative p-2 rounded-3xl flex gap-4 items-center mb-6 mt-7 mx-2 overflow-hidden"
-            style={{ boxShadow: "0 10px 10px rgba(0,0,0,0.2)" }}
+            style={{ boxShadow: "0 10px 10px rgba(0,0,0,0.1)" }}
           >
             <div
               className="absolute inset-0 z-0"
@@ -142,18 +155,18 @@ const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
             <div className="relative z-10 flex gap-4 items-center w-full md:h-50">
               <img
                 src={CHARACTER_IMAGES_WITHOUT_BG[profile?.aura_id] || CHARACTER_IMAGES_WITHOUT_BG .healer}
-                className="w-32 h-40 object-contain drop-shadow-lg -mt-2 -mb-2 md:w-40 md:h-55"
+                className="w-32 h-40 object-contain drop-shadow-lg -mt-2 -mb-2 md:w-40 md:h-55 md:ml-25"
               />
               <div className="flex-1 pr-3">
                 <p
-                  className="text-xs font-medium mb-5 md:text-lg"
+                  className="text-xs font-medium mb-5 md:text-lg md:ml-10"
                   style={{ color: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer }}
                 >
                   Hey {profile?.username || "Bestie"}. How are you today?
                 </p>
                 <button
                   onClick={() => setIsChatOpen(true)}
-                  className="bg-white px-8 py-1 rounded-full text-xs font-bold shadow-md hover:scale-105 transition-transform md:text-lg"
+                  className="bg-white px-13 md:px-20 py-1 rounded-full text-xs font-bold shadow-md hover:scale-105 transition-transform md:text-lg md:ml-10"
                   style={{ color: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer }}
                 >
                   Start to chat
@@ -179,25 +192,35 @@ const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
                 <button onClick={() => addWater(250)} className="w-8 h-8 rounded-full bg-blue-400 text-white shadow text-lg leading-none">+</button>
               </div>
             </div>
-            <div className="glass-card p-4 rounded-3xl text-center shadow-lg ml-1 mr-2 md:text-lg">
+              <div className="glass-card p-4 rounded-3xl text-center shadow-lg ml-1 mr-2 md:text-lg">
               <h2 className="font-body font-black text-xs text-gradient-pink mb-4 md:text-lg">
                 CYCLE TRACKER
               </h2>
-              <CalendarDays size={100} className=" mx-auto mb-2 text-purple-300" />
+              <CalendarDays size={100} className="mx-auto mb-2 text-purple-300" />
+
               {cycle ? (
-                cycle.isOnPeriod ? (
-                  <>
-                    <p className="text-xl font-bold text-rose-500">Day {cycle.cycleDay}</p>
-                    <p className="text-[10px] text-gray-400 md:text-sm">On your period</p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-xl font-bold">{cycle.daysUntilNext}</p>
-                    <p className="text-[10px] text-gray-400 md:text-sm">
-                      {cycle.daysUntilNext === 1 ? "day" : "days"} until period
-                    </p>
-                  </>
-                )
+                <>
+                  {cycle.isOnPeriod ? (
+                    <>
+                      <p className="text-xl font-bold text-rose-500">Day {cycle.cycleDay}</p>
+                      <p className="text-[10px] text-gray-400 md:text-sm">On your period</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xl font-bold">{cycle.daysUntilNext}</p>
+                      <p className="text-[10px] text-gray-400 md:text-sm">
+                        {cycle.daysUntilNext === 1 ? "day" : "days"} until period
+                      </p>
+                    </>
+                  )}
+
+                  <button
+                    onClick={() => setShowCalendar(true)}
+                    className="mt-2 text-[10px] font-bold text-white rounded-full bg-purple-400 w-30 h-5 hover:bg-purple-600"
+                  >
+                    {"Log current period >"}
+                  </button>
+                </>
               ) : (
                 <>
                   <p className="text-sm font-bold">--</p>
@@ -210,8 +233,8 @@ const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
           {/* Pinterest Style Board */}
           <div className="glass-card p-5 rounded-3xl mt-4 shadow-lg mx-2">
             {/* Header */}
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gradient-pink md:text-lg">
+            <div className="items-center justify-between text-center">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gradient-pink md:text-lg -mb-3">
                 YOUR PINTEREST PICK TODAY
               </h3>
               <br />
@@ -224,7 +247,7 @@ const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
 
             {/* AI Caption */}
             {boardLoading ? (
-              <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse mb-3" />
+              <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse mb-2" />
             ) : (
               <p className="text-[11px] text-gray-500 mb-3 italic leading-relaxed md:text-sm">
                 {caption}
@@ -233,11 +256,11 @@ const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
 
             {/* Board title tag */}
             {!boardLoading && title && (
-              <div className="mb-2 md:mb-10">
+              <div className="mb-2 md:mb-5">
                 <span
-                  className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white md:text-sm"
+                  className="text-[9px] font-bold py-0.5 rounded-full md:text-sm"
                   style={{
-                    backgroundColor: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer,
+                    color: TEXT_COLORS[profile?.aura_id] || TEXT_COLORS.healer,
                     opacity: 0.85,
                   }}
                 >
@@ -277,7 +300,7 @@ const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute inset-0 z-100 flex flex-col mt-10 md:max-w-3xl md:justify-center md:flex-col md:mx-auto"
+              className="absolute inset-0 z-100 flex flex-col md:max-w-3xl md:justify-center md:flex-col md:mx-auto"
               style={{
                 backgroundImage: `url(${CHARACTER_BACKGROUNDS[profile?.aura_id] || CHARACTER_BACKGROUNDS.healer})`,
                 backgroundSize: "cover",
@@ -365,6 +388,14 @@ const waterPct = Math.min(100, Math.round((dailyLog.water_ml / goalMl) * 100));
           )}
         </AnimatePresence>
         </main>
+        <PeriodCalendar
+          open={showCalendar}
+          onClose={() => setShowCalendar(false)}
+          lastPeriod={profile?.last_period_date}
+          isPeriodDay={isPeriodDay}
+          moodByDate={{}}
+          onSave={savePeriod}
+        />
       </div>
     </AppLayout>
   );
