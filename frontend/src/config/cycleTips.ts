@@ -46,3 +46,24 @@ export const SYMPTOMS = [
   { key: "cravings", label: "Cravings", emoji: "🍫", tip: "Opt for healthier snack alternatives (dark chocolate, nuts) and eat smaller, frequent meals." },
   { key: "acne", label: "Acne", emoji: "💢", tip: "Keep your skincare routine gentle and clean, avoid popping blemishes, and use soothing products." },
 ];
+
+export const HOME_CYCLE_TIPS: Record<string, Partial<Record<Phase, string>>> = {
+  healer: { 
+    soon: "Your period is coming soon, make sure to get some rest 🌸", 
+    period: "Your period is here, please be gentle with yourself 🤗" 
+  },
+  mentor: { 
+    soon: "Period approaching — prioritize lighter tasks for now.", 
+    period: "Menstrual phase active — keep warm and replenish your iron levels." 
+  },
+  sunshine: { 
+    soon: "Your period is around the corner! Stock up on snacks and warm drinks 🌻", 
+    period: "Your period is here! Time to just relax and chill out 🔥" 
+  },
+};
+
+export const WATER_NUDGE: Record<string, string> = {
+  healer: "Don't forget to drink some water 💧 Your body will surely thank you for it.",
+  mentor: "You haven't had enough water today — try to grab a glass right now.",
+  sunshine: "Drink up, bestie! 💧 Keep that skin glowing and body thriving!",
+};
