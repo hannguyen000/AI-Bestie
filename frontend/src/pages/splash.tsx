@@ -84,7 +84,7 @@ export default function Splash() {
 
         {/* Floating mood pills */}
         <div
-          className="absolute -left-13 top-12 z-20 glass-card px-3 py-1.5 animate-float animation-delay-300"
+          className="absolute -left-13 top-12 z-20 glass-card px-3 py-1.5 animate-float animation-delay-300 rounded-full"
           style={{ animationDuration: "3.5s" }}
         >
           <span className="text-xs font-semibold text-aura-pink-dark">
@@ -92,7 +92,7 @@ export default function Splash() {
           </span>
         </div>
         <div
-          className="absolute -right-10 bottom-10 z-20 glass-card px-3 py-1.5 animate-float animation-delay-500"
+          className="absolute -right-10 bottom-10 z-20 glass-card px-3 py-1.5 animate-float animation-delay-500 rounded-full"
           style={{ animationDuration: "4s" }}
         >
           <span className="text-xs font-semibold text-aura-lav-dark">
@@ -100,7 +100,7 @@ export default function Splash() {
           </span>
         </div>
         <div
-          className="absolute -right-15 top-0 z-20 glass-card px-3 py-1.5 animate-float animation-delay-500"
+          className="absolute -right-15 top-0 z-20 glass-card px-3 py-1.5 animate-float animation-delay-500 rounded-full"
           style={{ animationDuration: "4s" }}
         >
           <span className="text-xs font-semibold text-aura-lav-dark">

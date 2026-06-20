@@ -9,7 +9,7 @@ export async function updateProfile(userId: string, data: any) {
 
   if (error) {
     console.error("Supabase Error:", error);
-    throw error; // Ném lỗi này để handleUpdate bắt được
+    throw error; 
   }
   return updatedData;
 }

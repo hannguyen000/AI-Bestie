@@ -152,7 +152,7 @@ export default function Profile() {
       }}
     />
     <main className="flex-1 h-full overflow-y-auto">
-    <div className="max-w-3xl overflow-y-auto md:mx-auto">
+    <div className="max-w-5xl overflow-y-auto md:mx-auto">
     <div 
           className="absolute inset-0 z-0" 
           style={{
